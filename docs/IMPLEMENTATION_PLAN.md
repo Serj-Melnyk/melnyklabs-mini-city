@@ -637,3 +637,17 @@ completed successfully in 39 seconds. The public URL loaded the production
 canvas, dismissed its loading screen, exposed the reference-style hover card,
 and logged no application error:
 `https://serj-melnyk.github.io/melnyklabs-mini-city/`.
+
+### Compact callout polish
+
+Completed locally on 2026-07-21 after close-camera QA:
+
+- removed camera-distance scaling from building callouts so they remain a
+  stable 220 px wide on desktop and 168 px wide in compact layouts;
+- reduced padding, type scale, border weight, connector length, and glow;
+- hid the callout when its matching information panel is already open so the
+  same title and description are not duplicated over the content panel;
+- reproduced the Contact Station issue, measured the corrected hover card at
+  220×56.7 px, and verified that it disappears while the Contact panel is open;
+- passed lint, TypeScript, 35 tests, the GitHub Pages base-path production
+  build, Browser/IAB interaction checks, and console-error review.

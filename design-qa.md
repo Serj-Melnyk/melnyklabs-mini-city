@@ -88,4 +88,48 @@ The implementation now follows the reference's concrete layout:
 - No application error was logged. The only console warning is the upstream
   Three.js `Clock` deprecation in the development dependency path.
 
+## Compact callout regression QA
+
+Source defect evidence:
+`/Users/serhii/Desktop/Знімок екрана 2026-07-21 о 13.45.02.png`
+
+Post-fix implementation evidence:
+`/Users/serhii/.codex/visualizations/2026/07/20/019f8152-211e-7680-aa18-45a660cc8a42/melnyklabs-compact-contact-callout-1280x720.png`
+
+Viewport and state: the source is a browser-framed close Contact Station view
+with its panel open; the selected IAB surface supplied a native 1280×720
+close Contact Station view. The focused callout regions were inspected
+together. The post-fix card was also measured directly in the browser.
+
+**Findings and comparison history**
+
+- [P1 closed] The original callout inherited camera-distance scaling and grew
+  to cover most of the scene. The fix removes `distanceFactor`; the same
+  Contact callout now remains 220×56.7 px at the close camera.
+- [P2 closed] The callout duplicated the title and summary while the Contact
+  information panel was open. The fix suppresses the matching callout whenever
+  that panel is open; pointer highlighting remains active.
+- No actionable P0/P1/P2 finding remains.
+
+**Required fidelity surfaces**
+
+- Typography: Inter, uppercase title hierarchy, weight, and copy are retained
+  at a smaller `.78rem`/`.68rem` desktop scale.
+- Spacing and layout rhythm: width, padding, radius, connector, and shadow are
+  reduced to the compact proportions visible in the supplied concept family.
+- Colors and tokens: the existing ink background, cream copy, and per-location
+  accent border remain unchanged.
+- Image and asset fidelity: no 3D model, texture, crop, or lighting asset was
+  changed by this UI-only correction.
+- Copy and content: every location title and description remains unchanged;
+  duplicate visible content is removed only while the full panel is open.
+
+**Validation**
+
+- Contact hover with panel closed: 220×56.7 px and inside the 1280×720 viewport.
+- Contact hover with panel open: no `.building-callout` rendered.
+- Lint, TypeScript, 35/35 tests, and GitHub Pages base-path build passed.
+- Browser console: no application error; only the known upstream Three.js
+  `Clock` deprecation warning.
+
 final result: passed

@@ -15,7 +15,9 @@ The building interaction-state reference is
 [`melnyklabs-hover-labels-reference.png`](design/melnyklabs-hover-labels-reference.png).
 On pointer hover, each building shows a dark two-line HTML callout with its
 own accent border and a short connector line. The label remains crisp, does
-not intercept pointer input, and identifies only the hovered building.
+not intercept pointer input, and identifies only the hovered building. Its
+screen size is fixed rather than changing with camera distance, and it is
+hidden while the matching information panel is open.
 
 ## Design principles
 

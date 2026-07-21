@@ -14,10 +14,13 @@ export function InteractiveObject({ location, children }: InteractiveObjectProps
   const compactViewport = useThree((state) => state.size.width <= 900)
   const activeLocation = useCityStore((state) => state.activeLocation)
   const hoveredLocation = useCityStore((state) => state.hoveredLocation)
+  const isPanelOpen = useCityStore((state) => state.isPanelOpen)
   const setActiveLocation = useCityStore((state) => state.setActiveLocation)
   const setHoveredLocation = useCityStore((state) => state.setHoveredLocation)
+  const callout = location.callout
   const isActive = activeLocation === location.id
   const isHovered = isPointerHovered || hoveredLocation === location.id
+  const showCallout = isPointerHovered && callout && !(isActive && isPanelOpen)
 
   const selectLocation = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation()
@@ -42,13 +45,12 @@ export function InteractiveObject({ location, children }: InteractiveObjectProps
       }}
     >
       {children({ isActive, isHovered })}
-      {isPointerHovered && location.callout && (
+      {showCallout && callout && (
         <Html
           center
-          position={compactViewport && location.callout.compactPosition
-            ? location.callout.compactPosition
-            : location.callout.position}
-          distanceFactor={location.callout.distanceFactor ?? 15}
+          position={compactViewport && callout.compactPosition
+            ? callout.compactPosition
+            : callout.position}
           className="building-callout-anchor"
           style={{ pointerEvents: 'none' }}
         >
@@ -56,11 +58,11 @@ export function InteractiveObject({ location, children }: InteractiveObjectProps
             aria-hidden="true"
             className="building-callout"
             style={{
-              '--callout-accent': location.callout.accent ?? location.color,
+              '--callout-accent': callout.accent ?? location.color,
             } as CSSProperties}
           >
-            <strong>{location.callout.title}</strong>
-            <span>{location.callout.description}</span>
+            <strong>{callout.title}</strong>
+            <span>{callout.description}</span>
           </span>
         </Html>
       )}
