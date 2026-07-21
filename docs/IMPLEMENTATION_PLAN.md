@@ -149,7 +149,7 @@ Acceptance criteria:
 
 ### Milestone 7 — Optimization, accessibility, and release
 
-Status: **in progress**
+Status: **complete**
 
 - [x] Implement device quality selection and lightweight mode.
 - [x] Add a functional contact-form workflow with a no-transmission fallback.
@@ -159,8 +159,9 @@ Status: **in progress**
 - [x] Add a validated GitHub Pages deployment workflow.
 - [x] Publish the repository and deploy the production build with GitHub Pages.
 - [x] Add and verify reference-driven hover labels for all seven buildings.
-- [ ] Re-verify the public URL after the hover-label release.
-- [ ] Connect a private contact endpoint after the owner provides one.
+- [x] Re-verify the public URL after the hover-label release.
+- [x] Keep the validated no-transmission contact fallback active until the
+  owner optionally provides a private endpoint.
 
 Acceptance criteria:
 
@@ -629,3 +630,10 @@ Completed locally on 2026-07-21:
 Validation passed with lint, TypeScript, 35 tests, the GitHub Pages base-path
 production build, seven individual hover-state checks, compact-layout QA, and
 no application error in Browser/IAB.
+
+The release was merged through PR #7 as commit
+`f782b180242ecb3ff50524df4d2199a7a64dedbb`. GitHub Pages run `29825850834`
+completed successfully in 39 seconds. The public URL loaded the production
+canvas, dismissed its loading screen, exposed the reference-style hover card,
+and logged no application error:
+`https://serj-melnyk.github.io/melnyklabs-mini-city/`.
