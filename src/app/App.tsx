@@ -7,6 +7,8 @@ import { Navigation } from '../ui/Navigation'
 import { WebGLFallback } from '../ui/WebGLFallback'
 import { RouteRail } from '../ui/RouteRail'
 import { useCityStore } from '../store/useCityStore'
+import { useReducedMotion } from '../hooks/useReducedMotion'
+import { useCityNavigation } from '../hooks/useCityNavigation'
 
 function canUseWebGL() {
   try {
@@ -23,35 +25,47 @@ export function App() {
   const [sceneReady, setSceneReady] = useState(false)
   const webGLAvailable = useMemo(() => canUseWebGL(), [])
   const setActiveLocation = useCityStore((state) => state.setActiveLocation)
+  const scrollProgress = useCityStore((state) => state.scrollProgress)
+  const reducedMotion = useReducedMotion()
+  useCityNavigation()
 
   return (
     <main className="app-shell">
-      <a className="skip-link" href="#city-content">
-        Skip the 3D scene
-      </a>
-      <Navigation />
+      <div className="experience-shell">
+        <a className="skip-link" href="#city-content">
+          Skip the 3D scene
+        </a>
+        <Navigation />
 
-      <section className="scene-shell" aria-label="Interactive city overview">
-        {webGLAvailable ? (
-          <CityCanvas onReady={() => setSceneReady(true)} />
-        ) : (
-          <WebGLFallback />
-        )}
-      </section>
+        <section className="scene-shell" aria-label="Interactive city overview">
+          {webGLAvailable ? (
+            <CityCanvas
+              onReady={() => setSceneReady(true)}
+              reducedMotion={reducedMotion}
+            />
+          ) : (
+            <WebGLFallback />
+          )}
+        </section>
 
-      <section className="hero-copy" id="city-content" aria-labelledby="hero-title">
-        <h1 id="hero-title">Digital products,<br />built with curiosity.</h1>
-        <p>Explore a small city of selected work, experiments and ideas.</p>
-        <button type="button" onClick={() => setActiveLocation('about')}>
-          Explore the city
-          <span aria-hidden="true">→</span>
-        </button>
-      </section>
+        <section
+          className={`hero-copy ${scrollProgress > 0.055 ? 'is-away' : ''}`}
+          id="city-content"
+          aria-labelledby="hero-title"
+        >
+          <h1 id="hero-title">Digital products,<br />built with curiosity.</h1>
+          <p>Explore a small city of selected work, experiments and ideas.</p>
+          <button type="button" onClick={() => setActiveLocation('about')}>
+            Explore the city
+            <span aria-hidden="true">→</span>
+          </button>
+        </section>
 
-      <RouteRail />
-      <InfoPanel />
-      <HelpHint />
-      {webGLAvailable && <LoadingScreen visible={!sceneReady} />}
+        <RouteRail />
+        <InfoPanel />
+        <HelpHint />
+        {webGLAvailable && <LoadingScreen visible={!sceneReady} />}
+      </div>
     </main>
   )
 }

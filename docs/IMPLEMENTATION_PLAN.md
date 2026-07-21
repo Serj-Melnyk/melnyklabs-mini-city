@@ -1,6 +1,6 @@
 # MelnykLabs Mini City — Living Implementation Plan
 
-Last updated: 2026-07-20
+Last updated: 2026-07-21
 
 ## Architecture
 
@@ -48,13 +48,25 @@ Acceptance criteria:
 
 ### Milestone 2 — Guided camera and scroll route
 
-Status: **not started**
+Status: **complete**
 
-- Interpolate through configured camera checkpoints from scroll progress.
-- Add constrained pointer look and touch swipe input.
-- Make menu navigation move the camera to a stop.
-- Add reduced-motion immediate transitions.
-- Preserve browser scroll and avoid trapping the visitor.
+- [x] Interpolate through configured camera checkpoints from scroll progress.
+- [x] Add constrained pointer look and touch swipe input.
+- [x] Make menu navigation move the camera to a stop.
+- [x] Add reduced-motion immediate transitions.
+- [x] Preserve browser scroll and avoid trapping the visitor.
+
+Acceptance criteria:
+
+- wheel and touch scroll update one normalized route progress value;
+- configured checkpoints are reached at 0%, 15%, 35%, 55%, 72%, 88%, and
+  100%;
+- HTML navigation and route dots move to deterministic location stops;
+- the camera eases toward each target without React state updates in
+  `useFrame`;
+- mouse look remains within ±12° horizontally and ±6° vertically;
+- reduced-motion navigation changes the camera immediately;
+- the user can always reverse direction with native wheel or touch scrolling.
 
 ### Milestone 3 — Reusable interactions and content panels
 
@@ -159,5 +171,53 @@ environment asset request.
 
 ## Next milestone
 
-After Milestone 1 is validated, implement only Milestone 2: guided camera and
-scroll route. Re-inspect the existing implementation and this plan first.
+Implement only Milestone 3: reusable interactions and complete content panels.
+Re-inspect the existing implementation and this plan first.
+
+## Milestone 2 decisions
+
+- The experience uses a 650svh page with a sticky 100svh scene. This creates a
+  real browser scroll range instead of intercepting or preventing wheel/touch
+  gestures.
+- `src/data/cameraRoute.ts` owns checkpoint progress and camera interpolation.
+  Camera locations remain outside React components.
+- Menu navigation sets the native scroll checkpoint immediately while the R3F
+  camera eases toward the new target. This is deterministic even when browser
+  animation frames are throttled.
+- Camera motion uses `MathUtils.damp` and invalidates the demand-rendered canvas
+  only while it is converging.
+- Pointer look is mouse-only. Touch input remains available for native vertical
+  scrolling.
+- Scrollbars are visually hidden to preserve the full-screen composition, but
+  scrolling remains native and fully functional.
+
+## Milestone 2 validation log
+
+Completed on 2026-07-21:
+
+- `npm run lint` — passed.
+- `npm run typecheck` — passed.
+- `npm run test` — passed, 6/6 tests across location and route configuration.
+- `npm run build` — passed; 299.8 kB gzip with the known Three.js chunk warning.
+- Browser console — no errors.
+- Desktop 1536×1024 — Projects navigation reached 35% exactly, displayed the
+  correct panel, and preserved the first-viewport design when returned to 0%.
+- Native wheel — moving from 35% to 51% selected Services without trapping or
+  snapping the scroll input.
+- Pointer look — center and edge screenshots produced different rendered camera
+  views while remaining within configured angular limits.
+- Reduced motion — emulated `prefers-reduced-motion: reduce` and verified About
+  moved immediately to 15%.
+- Mobile 390×844 — a 710 px vertical swipe reached 15.3% and selected About;
+  Contact navigation reached 88.0%, closed the menu, and kept the 366 px bottom
+  sheet inside the viewport.
+
+### Milestone 2 fidelity check
+
+The generated concept and the final browser screenshot were inspected at the
+same native 1536×1024 size. Header order, exact above-the-fold copy, typography
+hierarchy, indigo/cream/coral palette, hero/CTA position, city silhouette,
+right-side route rail, and bottom instruction remain aligned. The
+above-the-fold copy diff is empty. Detailed façades and environmental props
+remain the intentional production-asset deviation already recorded in
+Milestone 1.
