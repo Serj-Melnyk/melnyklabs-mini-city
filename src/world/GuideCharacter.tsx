@@ -1,7 +1,8 @@
-import { Html } from '@react-three/drei'
+import { Html, useGLTF } from '@react-three/drei'
 import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Group, MathUtils, Vector3 } from 'three'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Group, MathUtils, Object3D, Vector3 } from 'three'
+import { dracoDecoderPath, guideAssetPath } from '../data/cityAssets'
 import { getNextCarLocation } from '../data/carRoute'
 import {
   createGuideWalk,
@@ -11,6 +12,7 @@ import {
 } from '../data/guideRoute'
 import { getLocation, type LocationId } from '../data/locations'
 import { useCityStore } from '../store/useCityStore'
+import { cloneModel } from './modelUtils'
 
 type GuideCharacterProps = {
   reducedMotion: boolean
@@ -27,12 +29,12 @@ const pointTransition = 0.38
 
 export function GuideCharacter({ reducedMotion }: GuideCharacterProps) {
   const root = useRef<Group>(null)
-  const body = useRef<Group>(null)
-  const head = useRef<Group>(null)
-  const leftArm = useRef<Group>(null)
-  const rightArm = useRef<Group>(null)
-  const leftLeg = useRef<Group>(null)
-  const rightLeg = useRef<Group>(null)
+  const body = useRef<Object3D | null>(null)
+  const head = useRef<Object3D | null>(null)
+  const leftArm = useRef<Object3D | null>(null)
+  const rightArm = useRef<Object3D | null>(null)
+  const leftLeg = useRef<Object3D | null>(null)
+  const rightLeg = useRef<Object3D | null>(null)
   const currentPosition = useRef(new Vector3(...guideStops.plaza.position))
   const animation = useRef<GuideAnimation | null>(null)
   const [hovered, setHovered] = useState(false)
@@ -41,6 +43,8 @@ export function GuideCharacter({ reducedMotion }: GuideCharacterProps) {
   const navigationSequence = useCityStore((state) => state.navigationSequence)
   const setGuideState = useCityStore((state) => state.setGuideState)
   const nextLocation = getNextCarLocation(activeLocation)
+  const { scene: guideSource } = useGLTF(guideAssetPath, dracoDecoderPath)
+  const guideModel = useMemo(() => cloneModel(guideSource), [guideSource])
 
   const resetLimbs = useCallback(() => {
     if (body.current) body.current.position.y = 0
@@ -91,7 +95,13 @@ export function GuideCharacter({ reducedMotion }: GuideCharacterProps) {
   useLayoutEffect(() => {
     if (!root.current) return
     root.current.position.set(...guideStops.plaza.position)
-  }, [])
+    body.current = guideModel.getObjectByName('BodyPivot') ?? null
+    head.current = guideModel.getObjectByName('HeadPivot') ?? null
+    leftArm.current = guideModel.getObjectByName('LeftArmPivot') ?? null
+    rightArm.current = guideModel.getObjectByName('RightArmPivot') ?? null
+    leftLeg.current = guideModel.getObjectByName('LeftLegPivot') ?? null
+    rightLeg.current = guideModel.getObjectByName('RightLegPivot') ?? null
+  }, [guideModel])
 
   useEffect(() => {
     if (navigationSequence === 0) return
@@ -194,53 +204,7 @@ export function GuideCharacter({ reducedMotion }: GuideCharacterProps) {
         setHovered(false)
       }}
     >
-      <group ref={body}>
-        <mesh castShadow position={[0, 0.96, 0]}>
-          <capsuleGeometry args={[0.22, 0.52, 4, 8]} />
-          <meshStandardMaterial color="#e4ad52" roughness={0.9} />
-        </mesh>
-        <mesh castShadow position={[0, 1.08, 0.16]}>
-          <boxGeometry args={[0.3, 0.26, 0.08]} />
-          <meshStandardMaterial color="#f26b4f" roughness={0.86} />
-        </mesh>
-      </group>
-
-      <group ref={head} position={[0, 1.52, 0]}>
-        <mesh castShadow>
-          <sphereGeometry args={[0.25, 12, 12]} />
-          <meshStandardMaterial color="#9b644a" roughness={0.92} />
-        </mesh>
-        <mesh position={[0, 0.02, 0.22]}>
-          <boxGeometry args={[0.24, 0.08, 0.08]} />
-          <meshStandardMaterial color="#2a2430" roughness={0.8} />
-        </mesh>
-      </group>
-
-      <group ref={leftArm} position={[-0.29, 1.17, 0]}>
-        <mesh castShadow position={[0, -0.24, 0]}>
-          <capsuleGeometry args={[0.075, 0.34, 4, 8]} />
-          <meshStandardMaterial color="#e4ad52" roughness={0.9} />
-        </mesh>
-      </group>
-      <group ref={rightArm} position={[0.29, 1.17, 0]}>
-        <mesh castShadow position={[0, -0.24, 0]}>
-          <capsuleGeometry args={[0.075, 0.34, 4, 8]} />
-          <meshStandardMaterial color="#e4ad52" roughness={0.9} />
-        </mesh>
-      </group>
-
-      <group ref={leftLeg} position={[-0.12, 0.58, 0]}>
-        <mesh castShadow position={[0, -0.25, 0]}>
-          <capsuleGeometry args={[0.09, 0.34, 4, 8]} />
-          <meshStandardMaterial color="#243454" roughness={0.9} />
-        </mesh>
-      </group>
-      <group ref={rightLeg} position={[0.12, 0.58, 0]}>
-        <mesh castShadow position={[0, -0.25, 0]}>
-          <capsuleGeometry args={[0.09, 0.34, 4, 8]} />
-          <meshStandardMaterial color="#243454" roughness={0.9} />
-        </mesh>
-      </group>
+      <primitive object={guideModel} />
 
       {hovered && (
         <Html
@@ -256,3 +220,5 @@ export function GuideCharacter({ reducedMotion }: GuideCharacterProps) {
     </group>
   )
 }
+
+useGLTF.preload(guideAssetPath, dracoDecoderPath)

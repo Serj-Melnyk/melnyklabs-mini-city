@@ -1,25 +1,30 @@
-import { Html } from '@react-three/drei'
+import { Html, useGLTF } from '@react-three/drei'
 import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Group, Vector3 } from 'three'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Box3, Color, Group, Vector3 } from 'three'
 import {
   createCarTrip,
+  getCarTripDuration,
   getCarStopProgress,
   getNextCarLocation,
   sampleCarRoute,
   sampleCarTrip,
 } from '../data/carRoute'
 import { getLocation, type LocationId } from '../data/locations'
+import { carAssetPath } from '../data/cityAssets'
 import { carRuntime } from '../scene/carRuntime'
 import { useCityStore } from '../store/useCityStore'
+import { cloneModel, forEachStandardMaterial } from './modelUtils'
+import type { QualityMode } from '../data/quality'
 
 type NavigationCarProps = {
+  qualityMode: QualityMode
   reducedMotion: boolean
 }
 
 const localForward = new Vector3()
 
-export function NavigationCar({ reducedMotion }: NavigationCarProps) {
+export function NavigationCar({ qualityMode, reducedMotion }: NavigationCarProps) {
   const group = useRef<Group>(null)
   const currentProgress = useRef(getCarStopProgress('plaza'))
   const tripState = useRef<{
@@ -34,6 +39,29 @@ export function NavigationCar({ reducedMotion }: NavigationCarProps) {
   const completeCarTrip = useCityStore((state) => state.completeCarTrip)
   const setActiveLocation = useCityStore((state) => state.setActiveLocation)
   const nextLocation = getNextCarLocation(activeLocation)
+  const { scene: carSource } = useGLTF(carAssetPath)
+  const carModel = useMemo(() => {
+    const model = cloneModel(carSource)
+    const bounds = new Box3().setFromObject(model)
+    const size = bounds.getSize(new Vector3())
+    const center = bounds.getCenter(new Vector3())
+    const scale = 1.48 / Math.max(size.x, size.z)
+
+    model.position.set(-center.x, -bounds.min.y, -center.z)
+    forEachStandardMaterial(model, (material, mesh) => {
+      const name = mesh.name.toLowerCase()
+      material.map = null
+      material.roughness = name.includes('glass') ? 0.38 : 0.76
+      material.metalness = name.includes('glass') ? 0.08 : 0
+
+      if (name.includes('body')) material.color = new Color('#f26b4f')
+      if (name.includes('glass')) material.color = new Color('#172036')
+      if (name.includes('wheel')) material.color = new Color('#11182a')
+      material.needsUpdate = true
+    })
+
+    return { model, scale }
+  }, [carSource])
 
   const applyPose = useCallback((progress: number, traveling: boolean) => {
     if (!group.current) return
@@ -84,7 +112,8 @@ export function NavigationCar({ reducedMotion }: NavigationCarProps) {
     if (!state) return
 
     state.elapsed += delta
-    const amount = Math.min(state.elapsed / state.trip.duration, 1)
+    const duration = getCarTripDuration(state.trip, qualityMode === 'light')
+    const amount = Math.min(state.elapsed / duration, 1)
     currentProgress.current = sampleCarTrip(state.trip, amount)
 
     if (amount >= 1) {
@@ -127,38 +156,13 @@ export function NavigationCar({ reducedMotion }: NavigationCarProps) {
         setHovered(false)
       }}
     >
-      <mesh castShadow>
-        <boxGeometry args={[1.28, 0.38, 0.72]} />
-        <meshStandardMaterial color="#f26b4f" roughness={0.78} />
-      </mesh>
-      <mesh castShadow position={[-0.06, 0.32, 0]}>
-        <boxGeometry args={[0.72, 0.3, 0.62]} />
-        <meshStandardMaterial color="#f58a6f" roughness={0.75} />
-      </mesh>
-      <mesh position={[-0.06, 0.34, 0.316]}>
-        <boxGeometry args={[0.5, 0.16, 0.02]} />
-        <meshStandardMaterial color="#243454" roughness={0.5} />
-      </mesh>
-      <mesh position={[-0.06, 0.34, -0.316]}>
-        <boxGeometry args={[0.5, 0.16, 0.02]} />
-        <meshStandardMaterial color="#243454" roughness={0.5} />
-      </mesh>
-      {[0.48, -0.43].map((x) => (
-        <group key={x} position={[x, -0.18, 0]}>
-          {[0.38, -0.38].map((z) => (
-            <mesh key={z} position={[0, 0, z]} rotation={[Math.PI / 2, 0, 0]}>
-              <cylinderGeometry args={[0.16, 0.16, 0.13, 16]} />
-              <meshStandardMaterial color="#172036" roughness={0.7} />
-            </mesh>
-          ))}
-        </group>
-      ))}
-      {[0.22, -0.22].map((z) => (
-        <mesh key={z} position={[0.65, 0, z]}>
-          <boxGeometry args={[0.03, 0.12, 0.14]} />
-          <meshStandardMaterial color="#fff0d3" emissive="#fff0d3" emissiveIntensity={0.16} />
-        </mesh>
-      ))}
+      <group
+        position={[0, -0.32, 0]}
+        rotation={[0, Math.PI / 2, 0]}
+        scale={carModel.scale}
+      >
+        <primitive object={carModel.model} />
+      </group>
 
       {hovered && (
         <Html
@@ -174,3 +178,5 @@ export function NavigationCar({ reducedMotion }: NavigationCarProps) {
     </group>
   )
 }
+
+useGLTF.preload(carAssetPath)

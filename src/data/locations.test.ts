@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { carRouteConfig } from './carRoute'
 import { getLocation, locations, visibleLocations } from './locations'
 
 describe('city locations', () => {
@@ -18,5 +19,20 @@ describe('city locations', () => {
   it('keeps the plaza out of the main navigation', () => {
     expect(visibleLocations).toHaveLength(5)
     expect(getLocation('plaza').title).toBe('Central Plaza')
+  })
+
+  it('keeps every building beyond the car road with a visible safety gap', () => {
+    for (const location of visibleLocations) {
+      const buildingRadius = Math.hypot(location.position[0], location.position[2])
+      const innerFacadeRadius = buildingRadius - location.size[2] / 2
+      const stopRadius = Math.hypot(location.carStop[0], location.carStop[2])
+      const buildingAngle = Math.atan2(location.position[0], location.position[2])
+      const stopAngle = Math.atan2(location.carStop[0], location.carStop[2])
+
+      expect(innerFacadeRadius).toBeGreaterThan(carRouteConfig.roadOuterRadius + 0.25)
+      expect(stopRadius).toBeCloseTo(carRouteConfig.radius, 1)
+      expect(Math.abs(buildingAngle - stopAngle)).toBeLessThan(0.02)
+      expect(buildingRadius - stopRadius).toBeLessThan(2.75)
+    }
   })
 })

@@ -8,6 +8,7 @@ describe('navigation car state', () => {
       hoveredLocation: null,
       isPanelOpen: false,
       scrollProgress: 0,
+      viewDistance: 1,
       navigationSequence: 0,
       navigationRequest: null,
       carStatus: 'idle',
@@ -16,6 +17,19 @@ describe('navigation car state', () => {
       guideStatus: 'idle',
       guideTarget: 'plaza',
     })
+  })
+
+  it('adjusts and safely clamps the camera view distance', () => {
+    const store = useCityStore.getState()
+
+    store.adjustViewDistance(300)
+    expect(useCityStore.getState().viewDistance).toBeGreaterThan(1)
+
+    useCityStore.getState().adjustViewDistance(10_000)
+    expect(useCityStore.getState().viewDistance).toBe(1.45)
+
+    useCityStore.getState().adjustViewDistance(-10_000)
+    expect(useCityStore.getState().viewDistance).toBe(0.72)
   })
 
   it('travels before revealing the destination panel', () => {

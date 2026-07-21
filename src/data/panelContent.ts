@@ -143,6 +143,10 @@ export const panelContent: Record<PanelLocationId, PanelContent> = {
         label: 'Open GitHub profile',
         href: 'https://github.com/Serj-Melnyk',
       },
+      {
+        label: 'CAR Model by Ignition Labs — CC BY 3.0',
+        href: 'https://poly.pizza/m/5zUWP5UsLg-',
+      },
     ],
   },
 }

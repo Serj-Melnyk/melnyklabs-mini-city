@@ -30,7 +30,7 @@ export const cameraRoute: CameraStop[] = [
   {
     id: 'overview',
     progress: 1,
-    position: [13, 13, 17],
+    position: [12.4, 12.4, 16.4],
     target: [0, -1.15, 0],
   },
 ]

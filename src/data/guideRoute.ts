@@ -29,23 +29,23 @@ export const guideStops: Record<LocationId, GuideStop> = {
   },
   about: {
     position: [-1.35, 0, -1.2],
-    pointTarget: [0, 1.1, -4.6],
+    pointTarget: [0, 1.1, -7],
   },
   projects: {
     position: [1.45, 0, -0.8],
-    pointTarget: [5, 1, -1.8],
+    pointTarget: [6.3, 1, -3.3],
   },
   services: {
     position: [1.45, 0, 1.15],
-    pointTarget: [5.2, 0.9, 3.8],
+    pointTarget: [6.2, 0.9, 4],
   },
   lab: {
     position: [-1.35, 0, 1.25],
-    pointTarget: [-4.8, 0.8, 3.5],
+    pointTarget: [-6.2, 0.8, 4],
   },
   contact: {
     position: [-1.5, 0, -0.65],
-    pointTarget: [-5, 1, -2.3],
+    pointTarget: [-6.3, 1, -3.3],
   },
 }
 
