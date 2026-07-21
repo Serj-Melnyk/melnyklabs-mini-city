@@ -173,9 +173,14 @@ def empty(name, location=(0, 0, 0)):
 
 
 def parent_keep_world(child, parent):
+    # Newly created empties do not always have an evaluated matrix yet. Without
+    # this update, exported guide pivots collapse to the asset origin and limb
+    # rotations make the arms and legs appear detached.
+    bpy.context.view_layer.update()
     matrix = child.matrix_world.copy()
     child.parent = parent
     child.matrix_world = matrix
+    bpy.context.view_layer.update()
 
 
 def window_row(width, height, z, count, depth, mat, prefix="Window"):
