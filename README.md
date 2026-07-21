@@ -4,6 +4,8 @@ An interactive low-poly 3D portfolio presented as a small tabletop city. The
 project is being delivered milestone by milestone; the current version has a
 validated city blockout, guided camera route, reusable object interactions,
 complete content panels, direct links, and a working navigation car.
+The current build also includes an interactive low-poly guide character with
+accessible Walk and Point cues.
 
 ## Run locally
 
@@ -31,11 +33,15 @@ npm run build
 
 ## Current scope
 
-Milestones 1–4 include the React/Vite foundation, React Three Fiber canvas,
+Milestones 1–5 include the React/Vite foundation, React Three Fiber canvas,
 primitive city blockout, lighting, HTML navigation, loading UI, responsive
 layouts, WebGL fallback, scroll/swipe camera route, menu-driven checkpoints,
 constrained pointer look, reduced-motion behavior, shared hover/focus/click
 interactions, responsive content panels, and URL hash deep links. Detailed
-models and character animation belong to later milestones. The navigation car
-now follows a configured ring road, accepts direct clicks, drives to menu
-destinations, exposes accessible status, and supports reduced motion.
+production models and authored GLB animation belong to later milestones. The
+navigation car now follows a configured ring road, accepts direct clicks,
+drives to menu destinations, exposes accessible status, and supports reduced
+motion.
+The guide uses configured safe stops, responds to navigation, previews the next
+destination when clicked, and duplicates every orientation cue in an HTML live
+region.

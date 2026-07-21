@@ -7,6 +7,7 @@ import { Navigation } from '../ui/Navigation'
 import { WebGLFallback } from '../ui/WebGLFallback'
 import { RouteRail } from '../ui/RouteRail'
 import { CarStatus } from '../ui/CarStatus'
+import { GuideStatus } from '../ui/GuideStatus'
 import { useCityStore } from '../store/useCityStore'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { useCityNavigation } from '../hooks/useCityNavigation'
@@ -71,6 +72,7 @@ export function App() {
 
         <RouteRail />
         <CarStatus />
+        <GuideStatus />
         <InfoPanel />
         <HelpHint />
         {webGLAvailable && <LoadingScreen visible={!sceneReady} />}

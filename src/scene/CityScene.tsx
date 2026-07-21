@@ -3,6 +3,7 @@ import { Building } from '../world/Building'
 import { CityDetails } from '../world/CityDetails'
 import { CityGround } from '../world/CityGround'
 import { NavigationCar } from '../world/NavigationCar'
+import { GuideCharacter } from '../world/GuideCharacter'
 import { Lighting } from './Lighting'
 
 type CitySceneProps = {
@@ -21,6 +22,7 @@ export function CityScene({ reducedMotion }: CitySceneProps) {
           <Building key={location.id} location={location} />
         ))}
         <NavigationCar reducedMotion={reducedMotion} />
+        <GuideCharacter reducedMotion={reducedMotion} />
         <CityDetails />
       </group>
     </>

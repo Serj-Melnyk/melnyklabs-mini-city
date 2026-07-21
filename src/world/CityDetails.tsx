@@ -24,17 +24,6 @@ export function CityDetails() {
       {treePositions.map((position) => (
         <Tree key={position.join('-')} position={position} />
       ))}
-
-      <group position={[-0.7, 0, 2.2]}>
-        <mesh castShadow position={[0, 0.73, 0]}>
-          <capsuleGeometry args={[0.22, 0.65, 4, 8]} />
-          <meshStandardMaterial color="#e4ad52" roughness={0.9} />
-        </mesh>
-        <mesh castShadow position={[0, 1.35, 0]}>
-          <sphereGeometry args={[0.27, 12, 12]} />
-          <meshStandardMaterial color="#9b644a" roughness={0.92} />
-        </mesh>
-      </group>
     </group>
   )
 }
