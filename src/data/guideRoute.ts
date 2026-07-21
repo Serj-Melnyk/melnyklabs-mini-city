@@ -24,7 +24,7 @@ export const guideMotionConfig = {
 
 export const guideStops: Record<LocationId, GuideStop> = {
   plaza: {
-    position: [-0.7, 0, 2.2],
+    position: [0.82, 0, 2.15],
     pointTarget: [0, 0.35, 0],
   },
   about: {
@@ -44,8 +44,8 @@ export const guideStops: Record<LocationId, GuideStop> = {
     pointTarget: [-6.2, 0.8, 4],
   },
   contact: {
-    position: [-1.5, 0, -0.65],
-    pointTarget: [-6.3, 1, -3.3],
+    position: [0.95, 0, 1.2],
+    pointTarget: [4.2, 1, 6.65],
   },
 }
 

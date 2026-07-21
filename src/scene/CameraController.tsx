@@ -23,7 +23,7 @@ export function CameraController({ reducedMotion }: CameraControllerProps) {
   const pointer = useRef({ x: 0, y: 0 })
   const viewportAspect = size.width / Math.max(size.height, 1)
   const responsiveDistance = viewportAspect > 1.65
-    ? 1.18
+    ? 0.88
     : viewportAspect < 0.9
       ? 1.18
       : 1

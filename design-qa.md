@@ -1,93 +1,91 @@
 # MelnykLabs Mini City — Design QA
 
-Source visual truth: `docs/design/melnyklabs-mini-city-reference.png`
+Source visual truth:
+`docs/design/melnyklabs-hover-labels-reference.png`
 
-Final desktop evidence:
-`/Users/serhii/.codex/visualizations/2026/07/20/019f8152-211e-7680-aa18-45a660cc8a42/melnyklabs-seven-building-neutral.png`
+Final desktop overview evidence:
+`/Users/serhii/.codex/visualizations/2026/07/20/019f8152-211e-7680-aa18-45a660cc8a42/melnyklabs-final-reference-aligned-1280x720.png`
 
-Final same-size comparison:
-`/Users/serhii/.codex/visualizations/2026/07/20/019f8152-211e-7680-aa18-45a660cc8a42/reference-vs-seven-building-final.png`
+Final desktop hover evidence:
+`/Users/serhii/.codex/visualizations/2026/07/20/019f8152-211e-7680-aa18-45a660cc8a42/melnyklabs-final-developer-hover-1280x720.png`
 
-Focused lighting and Studio-frame evidence:
-`/Users/serhii/.codex/visualizations/2026/07/20/019f8152-211e-7680-aa18-45a660cc8a42/melnyklabs-reference-pass-final.jpg`
+Final compact evidence:
+`/Users/serhii/.codex/visualizations/2026/07/20/019f8152-211e-7680-aa18-45a660cc8a42/melnyklabs-final-compact-821x814.png`
 
-State: Central Plaza overview with `quality=full`.
+Final compact hover evidence:
+`/Users/serhii/.codex/visualizations/2026/07/20/019f8152-211e-7680-aa18-45a660cc8a42/melnyklabs-final-compact-developer-hover-821x814.png`
 
-Viewport: source and stable implementation captures are both 1568×1003. The
-in-app browser accepted a 390×844 mobile emulation for CSS and DOM checks, but
-its screenshot surface returned a compressed 390×249 frame. Mobile layout was
-therefore verified through semantic DOM, menu interaction, Contact navigation,
-and absence of application errors; the native-height screenshot mismatch is a
-capture-surface limitation.
+State: Central Plaza overview with `quality=full`, plus the Developer Studio
+hover state. The supplied source is a fixed 1536×1024 render; the selected
+in-app browser supplied native 1280×720 and 821×814 viewports. The source and
+browser captures were inspected together at original resolution rather than
+distorting the reference to a different aspect ratio.
 
-## Full-view comparison
+## Reference comparison
 
-The source and implementation were joined at their native 1568×1003 size and
-inspected together. The implementation now follows the same seven-building
-tabletop composition: three project districts, Developer Studio as the back
-center landmark, Innovation Lab at lower left, Service Garage at right,
-Contact Station at lower right, and a circular public plaza in the middle.
+The implementation now follows the reference's concrete layout:
+
+- Project District 1, Developer Studio, and Project District 3 form the back
+  row;
+- Project District 2 and Service Garage balance the left and right edges;
+- Innovation Lab and Contact Station complete the lower arc;
+- Developer Studio, the monument, the guide, and Contact Station share the
+  main vertical axis;
+- the guide stands in front of the monument in a green shirt with visible hair;
+- the original sports car remains on the circular road;
+- labels appear only over the building currently under the pointer.
 
 ## Comparison points
 
 | Surface | Result |
 | --- | --- |
-| Building inventory and hierarchy | Seven visible buildings now match the reference story and relative district hierarchy. |
-| Façade identity | Every building has authored mesh lettering; code, project, lab, contact, and garage geometry remain readable without carrying essential content. |
-| Roads and public space | Ring road, radial approaches, rotated foundations, green verge beds, two crosswalks, layered platform, lamps, benches, and trees reproduce the tabletop rhythm. |
-| Lighting and materials | Warm directional light, darker fill, local shadows, matte materials, and a radial indigo background improve the reference's light/dark separation. |
-| Header and hero | Brand, navigation order, exact heading, support copy, and CTA preserve the source hierarchy and placement family. |
-| Vehicle and guide | The original coral sports car follows the road nose-first; the smaller authored guide sits inside the safe plaza. |
-| Interaction | Menu, route rail, building clicks, one-way car travel, panels, contact form, reduced motion, and HTML fallback remain functional. |
+| Building inventory | Seven buildings are visible and distributed around the ring without occupying the car lane. |
+| Reference hierarchy | Developer Studio is the back-center landmark; Contact Station is smaller and centered on the lower axis. |
+| Hover labels | All seven buildings expose a dark two-line card, colored outline, glow, and connector matching the reference language. |
+| Edge safety | Desktop and compact label positions were checked; left, right, and top cards remain inside the viewport. |
+| Character | The project-owned guide asset now uses the reference's green shirt, dark trousers, skin tone, and low-poly hair instead of the former mustard jacket and visor. |
+| Camera | Wide screens start closer to the diorama so the city carries similar visual weight to the supplied render. |
+| Interaction | Navigation, one-way car travel, camera look, zoom, content panels, contact form, reduced motion, and HTML fallback remain intact. |
 
 ## Closed findings
 
-- [x] Added the two missing Project District GLBs and integrated a complete
-  seven-building layout.
-- [x] Added crisp façade names as Blender-generated mesh geometry and retained
-  semantic equivalents in HTML.
-- [x] Added connected approaches, rotated foundations, green verge modules,
-  crosswalks, street furniture, and a layered platform base.
-- [x] Tuned overview camera, building-facing angles, warmer light, background
-  depth, hero scale, and landmark hierarchy against the source capture.
-- [x] Removed the legacy car quarter-turn so the sports car travels nose-first.
-- [x] Kept every building beyond the outer curb and every primary car stop on
-  the configured one-way circular route.
+- [x] Replaced the earlier uneven arrangement with the reference's back-row,
+  side-pair, and lower-arc composition.
+- [x] Moved Contact Station onto the Developer–monument axis and added its
+  aligned pedestrian crossing.
+- [x] Reduced Contact Station's model scale so it no longer dominates the
+  lower foreground.
+- [x] Moved the guide into the visible center-front position and regenerated
+  the original GLB with reference-aligned colors and hair.
+- [x] Added hover-only callouts for all seven buildings, including responsive
+  offsets and per-building scale where depth required it.
+- [x] Increased the wide-screen visual weight of the city and verified the
+  compact menu layout at 821×814.
 
 ## Intentional deviations
 
-- The source is a rendered concept image; production uses original,
-  reproducible low-poly GLBs rather than attempting to copy its exact meshes.
-- Essential portfolio content remains semantic HTML instead of being baked
+- The source is a rendered concept; production keeps reproducible, original
+  low-poly GLBs instead of copying the exact meshes or textures.
+- The seventh building is retained at the owner's request and integrated as
+  the Innovation Lab in the lower-left arc.
+- Essential portfolio content remains semantic HTML rather than being baked
   exclusively into WebGL.
-- The production UI includes the user-requested `Shift + scroll to zoom` hint,
-  a working contact form, reduced-motion behavior, and WebGL fallback that are
-  not visible in the static reference.
-- The remaining difference is polish-level asset granularity (for example
-  roof HVAC variations and more planted curb islands), not missing layout,
-  identity, navigation, or interaction structure.
+- The hero copy, working form, route rail, reduced-motion behavior, WebGL
+  fallback, and `Shift + scroll to zoom` hint remain functional production
+  additions beyond the static reference.
 
 ## Validation
 
 - `npm run lint` — passed.
 - `npm run typecheck` — passed.
-- `npm test -- --run` — 34/34 passed across nine suites.
-- `npm run build` — passed.
+- `npm test -- --run` — 35/35 passed across nine suites.
 - `VITE_BASE_PATH=/melnyklabs-mini-city/ npm run build` — passed.
-- Ten project-owned GLBs total 696,940 bytes, below the 4 MB budget.
-- Desktop Browser/IAB — full scene, header, hero, route rail, car, and props
-  verified with no application error.
-- Mobile Browser/IAB — menu opened, exact Contact navigation reached
-  `#contact`, Contact Station content appeared, and no application error was
-  logged.
-- The only console warning is the upstream Three.js `Clock` deprecation in the
-  development dependency path.
-
-## Follow-up polish
-
-- Add small roof and curb-island variations only if they do not compromise the
-  current payload and mobile clarity.
-- Replace the development-only upstream `Clock` warning when React Three Fiber
-  updates its dependency path.
+- Browser/IAB desktop — final overview and Developer Studio hover checked.
+- Browser/IAB compact 821×814 — city, menu layout, character, and hover card
+  checked.
+- All seven hover labels were exercised individually and their client bounds
+  inspected.
+- No application error was logged. The only console warning is the upstream
+  Three.js `Clock` deprecation in the development dependency path.
 
 final result: passed

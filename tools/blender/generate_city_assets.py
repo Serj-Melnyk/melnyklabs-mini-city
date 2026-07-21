@@ -532,11 +532,10 @@ def build_car():
 
 def build_guide():
     reset_scene()
-    mustard = material("Guide jacket", PALETTE["mustard"])
-    coral = material("Guide badge", PALETTE["coral"])
+    green = material("Guide shirt", PALETTE["green"])
     skin = material("Guide skin", PALETTE["skin"])
     dark = material("Guide navy", PALETTE["ink"])
-    visor = material("Guide visor", PALETTE["ink_dark"], roughness=0.42, metallic=0.08)
+    hair = material("Guide hair", PALETTE["wood"])
 
     root = empty("GuideAsset")
     body_pivot = empty("BodyPivot")
@@ -548,17 +547,16 @@ def build_guide():
     for pivot in (body_pivot, head_pivot, left_arm_pivot, right_arm_pivot, left_leg_pivot, right_leg_pivot):
         parent_keep_world(pivot, root)
 
-    body = cylinder("GuideBody", 0.24, 0.74, (0, 0.98, 0), mustard, vertices=12, bevel=0.05)
-    badge = box("GuideBadge", (0.3, 0.27, 0.09), (0, 1.08, 0.2), coral, bevel=0.035)
+    body = cylinder("GuideBody", 0.24, 0.74, (0, 0.98, 0), green, vertices=12, bevel=0.05)
     head = sphere("GuideHead", 0.27, (0, 1.52, 0), skin, subdivisions=2)
-    glasses = box("GuideVisor", (0.29, 0.09, 0.1), (0, 1.54, 0.23), visor, bevel=0.035)
-    for obj in (body, badge):
+    hair_cap = sphere("GuideHair", 0.23, (0, 1.71, -0.04), hair, subdivisions=1)
+    for obj in (body,):
         parent_keep_world(obj, body_pivot)
-    for obj in (head, glasses):
+    for obj in (head, hair_cap):
         parent_keep_world(obj, head_pivot)
 
-    left_arm = cylinder("GuideLeftArm", 0.08, 0.5, (-0.29, 0.93, 0), mustard, vertices=10, bevel=0.025)
-    right_arm = cylinder("GuideRightArm", 0.08, 0.5, (0.29, 0.93, 0), mustard, vertices=10, bevel=0.025)
+    left_arm = cylinder("GuideLeftArm", 0.08, 0.5, (-0.29, 0.93, 0), green, vertices=10, bevel=0.025)
+    right_arm = cylinder("GuideRightArm", 0.08, 0.5, (0.29, 0.93, 0), green, vertices=10, bevel=0.025)
     left_leg = cylinder("GuideLeftLeg", 0.095, 0.52, (-0.12, 0.33, 0), dark, vertices=10, bevel=0.025)
     right_leg = cylinder("GuideRightLeg", 0.095, 0.52, (0.12, 0.33, 0), dark, vertices=10, bevel=0.025)
     parent_keep_world(left_arm, left_arm_pivot)

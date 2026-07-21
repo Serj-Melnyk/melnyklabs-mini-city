@@ -157,7 +157,9 @@ Status: **in progress**
 - [x] Test desktop, mobile, production-base, and slow-resource loading behavior.
 - [x] Add production metadata, local fonts, manifest, favicon, and social image.
 - [x] Add a validated GitHub Pages deployment workflow.
-- [ ] Publish, deploy, and verify the public URL.
+- [x] Publish the repository and deploy the production build with GitHub Pages.
+- [x] Add and verify reference-driven hover labels for all seven buildings.
+- [ ] Re-verify the public URL after the hover-label release.
 - [ ] Connect a private contact endpoint after the owner provides one.
 
 Acceptance criteria:
@@ -559,8 +561,9 @@ bottom instruction placement remain aligned. The city framing was enlarged,
 fog moved farther away, and overlay opacity reduced after comparison so the
 diorama regains the reference's visual weight and brightness. The
 above-the-fold copy diff contains one intentional user-requested addition:
-“Shift + scroll to zoom.” Building labels remain omitted intentionally because
-portfolio copy stays accessible in HTML instead of being baked into WebGL.
+“Shift + scroll to zoom.” The later approved hover-label reference is recorded
+at `docs/design/melnyklabs-hover-labels-reference.png`; its labels are rendered
+as accessible-adjacent HTML overlays instead of being baked into WebGL.
 
 Browser/IAB accepted the 1568×1003 emulated CSS viewport, but its native
 screenshot surface tiled or clipped the sticky 650svh page at that override.
@@ -593,7 +596,7 @@ Final reference-pass validation:
 
 - `npm run lint` — passed;
 - `npm run typecheck` — passed;
-- `npm test -- --run` — 34/34 tests passed across nine suites;
+- `npm test -- --run` — 35/35 tests passed across nine suites;
 - `npm run build` — passed;
 - `VITE_BASE_PATH=/melnyklabs-mini-city/ npm run build` — passed;
 - ten original GLBs total 696,940 bytes, below the 4 MB budget;
@@ -605,3 +608,24 @@ The above-the-fold copy diff remains limited to the intentional,
 user-requested `Shift + scroll to zoom` hint. The remaining visual difference
 from the rendered concept is polish-level mesh granularity rather than missing
 composition, identity, or interaction structure.
+
+### Hover-label reference pass
+
+Completed locally on 2026-07-21:
+
+- rearranged the seven buildings into the supplied back-row, side-pair, and
+  lower-arc composition;
+- moved Contact Station onto the Developer Studio–monument axis, reduced its
+  foreground scale, and added the aligned crosswalk;
+- moved the guide in front of the monument and regenerated the project-owned
+  GLB with a green shirt and low-poly hair;
+- added hover-only two-line callouts for all seven buildings with individual
+  accent colors, connector lines, edge-safe offsets, and depth-aware scale;
+- enlarged the initial wide-screen framing and checked both native 1280×720
+  and compact 821×814 browser surfaces;
+- inspected the reference and implementation together and recorded the latest
+  evidence and closed findings in `design-qa.md`.
+
+Validation passed with lint, TypeScript, 35 tests, the GitHub Pages base-path
+production build, seven individual hover-state checks, compact-layout QA, and
+no application error in Browser/IAB.

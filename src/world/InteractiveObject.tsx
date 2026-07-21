@@ -1,6 +1,6 @@
 import { Html } from '@react-three/drei'
-import type { ThreeEvent } from '@react-three/fiber'
-import type { ReactNode } from 'react'
+import { useThree, type ThreeEvent } from '@react-three/fiber'
+import { useState, type CSSProperties, type ReactNode } from 'react'
 import type { CityLocation } from '../data/locations'
 import { useCityStore } from '../store/useCityStore'
 
@@ -10,12 +10,14 @@ type InteractiveObjectProps = {
 }
 
 export function InteractiveObject({ location, children }: InteractiveObjectProps) {
+  const [isPointerHovered, setIsPointerHovered] = useState(false)
+  const compactViewport = useThree((state) => state.size.width <= 900)
   const activeLocation = useCityStore((state) => state.activeLocation)
   const hoveredLocation = useCityStore((state) => state.hoveredLocation)
   const setActiveLocation = useCityStore((state) => state.setActiveLocation)
   const setHoveredLocation = useCityStore((state) => state.setHoveredLocation)
   const isActive = activeLocation === location.id
-  const isHovered = hoveredLocation === location.id
+  const isHovered = isPointerHovered || hoveredLocation === location.id
 
   const selectLocation = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation()
@@ -30,23 +32,36 @@ export function InteractiveObject({ location, children }: InteractiveObjectProps
       onPointerEnter={(event) => {
         event.stopPropagation()
         document.body.style.cursor = 'pointer'
+        setIsPointerHovered(true)
         setHoveredLocation(location.id)
       }}
       onPointerLeave={() => {
         document.body.style.cursor = 'default'
+        setIsPointerHovered(false)
         setHoveredLocation(null)
       }}
     >
       {children({ isActive, isHovered })}
-      {isHovered && (
+      {isPointerHovered && location.callout && (
         <Html
           center
-          position={[0, location.size[1] / 2 + 0.8, 0]}
-          distanceFactor={10}
-          className="object-tooltip-anchor"
+          position={compactViewport && location.callout.compactPosition
+            ? location.callout.compactPosition
+            : location.callout.position}
+          distanceFactor={location.callout.distanceFactor ?? 15}
+          className="building-callout-anchor"
           style={{ pointerEvents: 'none' }}
         >
-          <span className="object-tooltip">{location.shortTitle}</span>
+          <span
+            aria-hidden="true"
+            className="building-callout"
+            style={{
+              '--callout-accent': location.callout.accent ?? location.color,
+            } as CSSProperties}
+          >
+            <strong>{location.callout.title}</strong>
+            <span>{location.callout.description}</span>
+          </span>
         </Html>
       )}
     </group>

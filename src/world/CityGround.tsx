@@ -1,11 +1,17 @@
 import { carRouteConfig, sampleCarRoute } from '../data/carRoute'
-import { buildingLocations } from '../data/locations'
+import { buildingLocations, getLocation } from '../data/locations'
 
 const roadMarkers = Array.from({ length: 24 }, (_, index) =>
   sampleCarRoute(index / 24),
 )
 
-const crosswalkMarkers = [-0.55, 0.64].flatMap((angle, crosswalkIndex) =>
+const contactLocation = getLocation('contact')
+const contactAngle = Math.atan2(
+  contactLocation.position[0],
+  contactLocation.position[2],
+)
+
+const crosswalkMarkers = [-0.55, contactAngle, 0.64].flatMap((angle, crosswalkIndex) =>
   Array.from({ length: 6 }, (_, stripeIndex) => {
     const offset = -0.75 + stripeIndex * 0.3
     const radius = 5.52
