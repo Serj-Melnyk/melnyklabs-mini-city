@@ -651,3 +651,23 @@ Completed locally on 2026-07-21 after close-camera QA:
   220×56.7 px, and verified that it disappears while the Contact panel is open;
 - passed lint, TypeScript, 35 tests, the GitHub Pages base-path production
   build, Browser/IAB interaction checks, and console-error review.
+
+### Guide motion stabilization
+
+Completed locally on 2026-07-21 after character-walk QA:
+
+- fixed the Blender parenting helper so shoulder, hip, and head pivots retain
+  their authored coordinates in the exported guide GLB instead of collapsing
+  to the asset origin;
+- regenerated the project-owned guide asset and confirmed that arms and legs
+  now rotate around their attached joints;
+- removed torso-only vertical bobbing and reduced limb swing to keep the toy
+  walk readable without separating body parts;
+- moved all guide stops into a compact obstacle-free corridor in front of the
+  central monument;
+- centralized bench, lamp, and tree positions as scene data and added sampled
+  route-clearance tests for every origin/destination pair;
+- verified the guide click and point interaction in Browser/IAB with no
+  application error; the existing upstream Three.js `Clock` warning remains;
+- passed lint, TypeScript, 36/36 tests, and the GitHub Pages base-path
+  production build.

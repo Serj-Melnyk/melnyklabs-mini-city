@@ -20,31 +20,36 @@ export const guideMotionConfig = {
   minimumDuration: 0.65,
   maximumDuration: 1.55,
   pointDuration: 2.15,
+  landmarkClearanceRadius: 1.52,
+  corridorMinimumZ: 1.75,
+  corridorMaximumAbsX: 0.74,
+  collisionRadius: 0.26,
+  collisionMargin: 0.12,
 }
 
 export const guideStops: Record<LocationId, GuideStop> = {
   plaza: {
-    position: [0.82, 0, 2.15],
+    position: [0.35, 0, 2.12],
     pointTarget: [0, 0.35, 0],
   },
   about: {
-    position: [-1.35, 0, -1.2],
+    position: [-0.62, 0, 1.78],
     pointTarget: [0, 1.1, -7],
   },
   projects: {
-    position: [1.45, 0, -0.8],
+    position: [0.62, 0, 1.78],
     pointTarget: [6.3, 1, -3.3],
   },
   services: {
-    position: [1.45, 0, 1.15],
+    position: [0.72, 0, 2.08],
     pointTarget: [6.2, 0.9, 4],
   },
   lab: {
-    position: [-1.35, 0, 1.25],
+    position: [-0.72, 0, 2.08],
     pointTarget: [-6.2, 0.8, 4],
   },
   contact: {
-    position: [0.95, 0, 1.2],
+    position: [0, 0, 2.12],
     pointTarget: [4.2, 1, 6.65],
   },
 }

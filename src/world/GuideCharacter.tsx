@@ -29,7 +29,6 @@ const pointTransition = 0.38
 
 export function GuideCharacter({ reducedMotion }: GuideCharacterProps) {
   const root = useRef<Group>(null)
-  const body = useRef<Object3D | null>(null)
   const head = useRef<Object3D | null>(null)
   const leftArm = useRef<Object3D | null>(null)
   const rightArm = useRef<Object3D | null>(null)
@@ -47,7 +46,6 @@ export function GuideCharacter({ reducedMotion }: GuideCharacterProps) {
   const guideModel = useMemo(() => cloneModel(guideSource), [guideSource])
 
   const resetLimbs = useCallback(() => {
-    if (body.current) body.current.position.y = 0
     if (head.current) head.current.rotation.y = 0
     if (leftArm.current) leftArm.current.rotation.set(0, 0, 0)
     if (rightArm.current) rightArm.current.rotation.set(0, 0, 0)
@@ -95,7 +93,6 @@ export function GuideCharacter({ reducedMotion }: GuideCharacterProps) {
   useLayoutEffect(() => {
     if (!root.current) return
     root.current.position.set(...guideStops.plaza.position)
-    body.current = guideModel.getObjectByName('BodyPivot') ?? null
     head.current = guideModel.getObjectByName('HeadPivot') ?? null
     leftArm.current = guideModel.getObjectByName('LeftArmPivot') ?? null
     rightArm.current = guideModel.getObjectByName('RightArmPivot') ?? null
@@ -134,11 +131,10 @@ export function GuideCharacter({ reducedMotion }: GuideCharacterProps) {
         delta,
       )
       currentPosition.current.set(...position)
-      if (body.current) body.current.position.y = Math.abs(stride) * 0.045
-      if (leftArm.current) leftArm.current.rotation.x = -stride * 0.48
-      if (rightArm.current) rightArm.current.rotation.x = stride * 0.48
-      if (leftLeg.current) leftLeg.current.rotation.x = stride * 0.58
-      if (rightLeg.current) rightLeg.current.rotation.x = -stride * 0.58
+      if (leftArm.current) leftArm.current.rotation.x = -stride * 0.28
+      if (rightArm.current) rightArm.current.rotation.x = stride * 0.28
+      if (leftLeg.current) leftLeg.current.rotation.x = stride * 0.38
+      if (rightLeg.current) rightLeg.current.rotation.x = -stride * 0.38
 
       if (amount >= 1) {
         state.phase = 'pointing'

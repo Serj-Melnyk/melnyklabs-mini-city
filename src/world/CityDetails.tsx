@@ -1,25 +1,6 @@
 import { Instance, Instances } from '@react-three/drei'
+import { benchPoses, lampPositions, treePositions } from '../data/cityProps'
 import type { QualityMode } from '../data/quality'
-
-const treePositions: [number, number, number][] = [
-  [-2.5, 0, -2.3], [2.7, 0, -2.4], [-2.7, 0, 2.3], [2.5, 0, 2.5],
-  [-8.7, 0, -2.4], [-8.5, 0, 4.4], [-6.4, 0, 6.2], [8.8, 0, 0],
-]
-
-const lampPositions: [number, number, number][] = Array.from(
-  { length: 8 },
-  (_, index) => {
-    const angle = (index / 8) * Math.PI * 2
-    return [Math.sin(angle) * 2.75, 0, Math.cos(angle) * 2.75]
-  },
-)
-
-const benchPoses = [
-  { position: [1.9, 0.22, 1.15] as [number, number, number], rotation: -0.55 },
-  { position: [-1.9, 0.22, -1.15] as [number, number, number], rotation: -0.55 },
-  { position: [-1.65, 0.22, 1.55] as [number, number, number], rotation: 0.72 },
-  { position: [1.65, 0.22, -1.55] as [number, number, number], rotation: 0.72 },
-]
 
 export function CityDetails({ qualityMode }: { qualityMode: QualityMode }) {
   const visibleTrees = qualityMode === 'light' ? treePositions.slice(0, 4) : treePositions
