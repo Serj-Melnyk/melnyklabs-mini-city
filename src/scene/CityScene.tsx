@@ -2,9 +2,14 @@ import { locations } from '../data/locations'
 import { Building } from '../world/Building'
 import { CityDetails } from '../world/CityDetails'
 import { CityGround } from '../world/CityGround'
+import { NavigationCar } from '../world/NavigationCar'
 import { Lighting } from './Lighting'
 
-export function CityScene() {
+type CitySceneProps = {
+  reducedMotion: boolean
+}
+
+export function CityScene({ reducedMotion }: CitySceneProps) {
   return (
     <>
       <color attach="background" args={['#07142b']} />
@@ -15,6 +20,7 @@ export function CityScene() {
         {locations.map((location) => (
           <Building key={location.id} location={location} />
         ))}
+        <NavigationCar reducedMotion={reducedMotion} />
         <CityDetails />
       </group>
     </>

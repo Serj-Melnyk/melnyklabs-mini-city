@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useLayoutEffect, useMemo, useState } from 'react'
 import { CityCanvas } from '../scene/CityCanvas'
 import { HelpHint } from '../ui/HelpHint'
 import { InfoPanel } from '../ui/InfoPanel'
@@ -6,6 +6,7 @@ import { LoadingScreen } from '../ui/LoadingScreen'
 import { Navigation } from '../ui/Navigation'
 import { WebGLFallback } from '../ui/WebGLFallback'
 import { RouteRail } from '../ui/RouteRail'
+import { CarStatus } from '../ui/CarStatus'
 import { useCityStore } from '../store/useCityStore'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { useCityNavigation } from '../hooks/useCityNavigation'
@@ -26,10 +27,15 @@ export function App() {
   const [sceneReady, setSceneReady] = useState(false)
   const webGLAvailable = useMemo(() => canUseWebGL(), [])
   const setActiveLocation = useCityStore((state) => state.setActiveLocation)
+  const setCarEnabled = useCityStore((state) => state.setCarEnabled)
   const scrollProgress = useCityStore((state) => state.scrollProgress)
   const reducedMotion = useReducedMotion()
   useCityNavigation()
   useCityDeepLinks()
+
+  useLayoutEffect(() => {
+    setCarEnabled(webGLAvailable)
+  }, [setCarEnabled, webGLAvailable])
 
   return (
     <main className="app-shell">
@@ -64,6 +70,7 @@ export function App() {
         </section>
 
         <RouteRail />
+        <CarStatus />
         <InfoPanel />
         <HelpHint />
         {webGLAvailable && <LoadingScreen visible={!sceneReady} />}

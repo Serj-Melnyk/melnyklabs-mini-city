@@ -4,6 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { MathUtils, Spherical, Vector3 } from 'three'
 import { sampleCameraRoute } from '../data/cameraRoute'
 import { useCityStore } from '../store/useCityStore'
+import { carRuntime } from './carRuntime'
 
 type CameraControllerProps = {
   reducedMotion: boolean
@@ -32,7 +33,10 @@ export function CameraController({ reducedMotion }: CameraControllerProps) {
   useEffect(
     () =>
       useCityStore.subscribe((state, previousState) => {
-        if (state.scrollProgress !== previousState.scrollProgress) {
+        if (
+          state.scrollProgress !== previousState.scrollProgress ||
+          state.carStatus !== previousState.carStatus
+        ) {
           invalidate()
         }
       }),
@@ -72,11 +76,25 @@ export function CameraController({ reducedMotion }: CameraControllerProps) {
   }, [invalidate, reducedMotion])
 
   useFrame((_, delta) => {
-    const route = sampleCameraRoute(useCityStore.getState().scrollProgress)
-    desiredTarget.current.set(...route.target)
-    offset.current
-      .set(...route.position)
-      .sub(desiredTarget.current)
+    const cityState = useCityStore.getState()
+    const followsCar =
+      !reducedMotion &&
+      cityState.carStatus === 'driving' &&
+      carRuntime.isTraveling
+
+    if (followsCar) {
+      desiredTarget.current.copy(carRuntime.position)
+      desiredTarget.current.y += 0.55
+      desiredPosition.current.copy(carRuntime.position)
+      desiredPosition.current.addScaledVector(carRuntime.forward, -4.8)
+      desiredPosition.current.y += 3.5
+    } else {
+      const route = sampleCameraRoute(cityState.scrollProgress)
+      desiredTarget.current.set(...route.target)
+      desiredPosition.current.set(...route.position)
+    }
+
+    offset.current.copy(desiredPosition.current).sub(desiredTarget.current)
     spherical.current.setFromVector3(offset.current)
 
     if (!reducedMotion) {
