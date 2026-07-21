@@ -4,10 +4,9 @@ Run from the repository root:
 
     blender --background --python tools/blender/generate_city_assets.py
 
-The generated models intentionally use geometry and embedded materials only. This keeps
-the production payload small, avoids texture seams, and preserves the matte toy
-diorama look of the approved concept. The navigation car is the attributed
-Ignition Labs asset supplied separately in ``public/assets/models``.
+The generated models intentionally use original geometry and embedded materials only.
+This keeps the production payload small, avoids texture seams, and preserves the matte
+toy diorama look of the approved concept, including the MelnykLabs sports car.
 """
 
 from pathlib import Path
@@ -130,6 +129,40 @@ def sphere(name, radius, location=(0, 0, 0), mat=None, subdivisions=1):
     obj = bpy.context.object
     obj.name = name
     return finish_object(obj, mat)
+
+
+def station_shell(name, stations, mat=None, bevel=0.0):
+    """Build a faceted shell from x/y/half-width stations in web coordinates."""
+    vertices = []
+    for x, lower_y, upper_y, half_width in stations:
+        vertices.extend([
+            web_location((x, lower_y, -half_width)),
+            web_location((x, lower_y, half_width)),
+            web_location((x, upper_y, -half_width)),
+            web_location((x, upper_y, half_width)),
+        ])
+
+    faces = []
+    for index in range(len(stations) - 1):
+        start = index * 4
+        next_start = (index + 1) * 4
+        faces.extend([
+            (start, next_start, next_start + 1, start + 1),
+            (start + 2, start + 3, next_start + 3, next_start + 2),
+            (start, start + 2, next_start + 2, next_start),
+            (start + 1, next_start + 1, next_start + 3, start + 3),
+        ])
+    faces.extend([
+        (0, 1, 3, 2),
+        tuple(range((len(stations) - 1) * 4, len(stations) * 4)),
+    ])
+
+    mesh = bpy.data.meshes.new(f"{name}Mesh")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    return finish_object(obj, mat, bevel)
 
 
 def empty(name, location=(0, 0, 0)):
@@ -326,32 +359,71 @@ def build_contact():
 
 def build_car():
     reset_scene()
-    coral = material("Taxi coral", PALETTE["coral"])
-    coral_light = material("Taxi highlight", PALETTE["coral_light"])
-    dark = material("Taxi dark", PALETTE["ink_dark"])
-    glass = material("Taxi glass", PALETTE["glass"], roughness=0.32, metallic=0.08)
-    cream = material("Taxi lights", PALETTE["cream"], emission=PALETTE["cream"])
-    mustard = material("Taxi marker", PALETTE["mustard"])
-    box("TaxiBody", (1.38, 0.42, 0.76), (0, 0, 0), coral, bevel=0.1)
-    box("TaxiCab", (0.78, 0.38, 0.64), (-0.08, 0.37, 0), coral_light, bevel=0.09)
-    box("TaxiWindshield", (0.3, 0.2, 0.62), (0.34, 0.42, 0), glass, bevel=0.035, rotation=(0, math.radians(-12), 0))
-    box("TaxiRearWindow", (0.28, 0.2, 0.62), (-0.49, 0.4, 0), glass, bevel=0.035, rotation=(0, math.radians(12), 0))
-    box("TaxiRoofSign", (0.34, 0.16, 0.24), (-0.04, 0.67, 0), mustard, bevel=0.04)
+    coral = material("MelnykLabs coral", PALETTE["coral"], roughness=0.7)
+    coral_light = material("MelnykLabs highlight", PALETTE["coral_light"], roughness=0.68)
+    dark = material("Sports aero", PALETTE["ink_dark"], roughness=0.72)
+    glass = material("Sports glass", PALETTE["glass"], roughness=0.3, metallic=0.1)
+    cream = material("Headlights", PALETTE["cream"], emission=PALETTE["cream"])
+    tail = material("Tail lights", PALETTE["coral_light"], emission=PALETTE["coral_light"])
+    rim = material("Wheel rims", PALETTE["lavender"], roughness=0.48, metallic=0.36)
+
+    station_shell(
+        "SportsBody",
+        (
+            (-0.98, 0.16, 0.43, 0.33),
+            (-0.72, 0.11, 0.53, 0.44),
+            (0.3, 0.1, 0.43, 0.44),
+            (0.72, 0.12, 0.31, 0.39),
+            (1.0, 0.18, 0.25, 0.27),
+        ),
+        coral,
+        bevel=0.035,
+    )
+    station_shell(
+        "SportsGlassCanopy",
+        (
+            (-0.48, 0.48, 0.55, 0.3),
+            (-0.29, 0.53, 0.76, 0.31),
+            (0.14, 0.5, 0.76, 0.3),
+            (0.42, 0.43, 0.48, 0.27),
+        ),
+        glass,
+        bevel=0.025,
+    )
+    box("SportsRoofSpine", (0.46, 0.045, 0.62), (-0.07, 0.78, 0), dark, bevel=0.018)
+    box("FrontSplitter", (0.35, 0.055, 0.74), (0.84, 0.08, 0), dark, bevel=0.025)
+    box("RearDiffuser", (0.18, 0.1, 0.76), (-0.91, 0.11, 0), dark, bevel=0.025)
+    box("RearSpoilerBlade", (0.13, 0.07, 0.8), (-0.78, 0.65, 0), dark, bevel=0.025)
+    for side in (-0.29, 0.29):
+        box(f"RearSpoilerStand_{side}", (0.07, 0.24, 0.06), (-0.76, 0.53, side), dark, bevel=0.018)
+        box(f"SideIntake_{side}", (0.28, 0.13, 0.035), (-0.36, 0.26, side * 1.48), dark, bevel=0.018)
+
     for side in (-1, 1):
-        for x in (-0.45, 0.48):
+        for x in (-0.59, 0.56):
             cylinder(
                 f"Wheel_{side}_{x}",
-                0.18,
-                0.13,
-                (x, -0.18, side * 0.41),
+                0.225,
+                0.16,
+                (x, 0.19, side * 0.43),
                 dark,
-                vertices=16,
+                vertices=14,
                 rotation=(math.pi / 2, 0, 0),
-                bevel=0.02,
+                bevel=0.018,
             )
-    for side in (-0.23, 0.23):
-        box(f"Headlight_{side}", (0.04, 0.15, 0.14), (0.72, 0.02, side), cream, bevel=0.02)
-    export_asset("navigation-car.glb")
+            cylinder(
+                f"WheelRim_{side}_{x}",
+                0.12,
+                0.172,
+                (x, 0.19, side * 0.43),
+                rim,
+                vertices=10,
+                rotation=(math.pi / 2, 0, 0),
+            )
+    for side in (-0.2, 0.2):
+        box(f"Headlight_{side}", (0.055, 0.09, 0.18), (0.94, 0.25, side), cream, bevel=0.018)
+        box(f"TailLight_{side}", (0.045, 0.09, 0.2), (-0.96, 0.34, side), tail, bevel=0.018)
+    box("SportsAccent", (0.48, 0.035, 0.05), (0.45, 0.47, 0), coral_light, bevel=0.012)
+    export_asset("melnyklabs-sports-car.glb")
 
 
 def build_guide():
@@ -400,6 +472,7 @@ def main():
         build_garage,
         build_lab,
         build_contact,
+        build_car,
         build_guide,
     )
     for builder in builders:

@@ -448,10 +448,10 @@ deviation.
   OS version.
 - Exported city assets use Draco geometry compression and local decoder files,
   avoiding a runtime dependency on a third-party CDN.
-- The navigation car uses the supplied Ignition Labs CC BY 3.0 model from Poly
-  Pizza. Runtime normalization and material overrides keep it consistent with
-  the city palette; attribution is recorded in `ATTRIBUTIONS.md` and shown in
-  Contact Station.
+- The navigation car is an original Blender-generated MelnykLabs sports coupe:
+  a low wedge body, wide stance, dark canopy, splitter, diffuser, spoiler, and
+  chunky low-poly wheels. It is reproducible from the same project-owned asset
+  generator and needs no external model attribution.
 - Trees, lamp posts, bulbs, and benches are instanced. The scene keeps one
   directional shadow source plus restrained ambient fill and no post-processing.
 - Buildings moved beyond the outer curb and rotate toward the road. Car stops
@@ -472,7 +472,7 @@ Completed on 2026-07-21:
 - `npm run test` — passed, 25/25 tests across assets, road clearance, routes,
   deep links, store state, and camera checkpoints.
 - `npm run build` — passed with the known Three.js chunk-size warning.
-- Asset budget — eight GLBs total 2,023,892 bytes, below the 3–4 MB initial
+- Asset budget — eight GLBs total 247,620 bytes, below the 3–4 MB initial
   resource budget; all city-authored GLBs are Draco-compressed.
 - Browser loading — the branded loading screen remained until the suspended
   model subtree resolved.
@@ -493,7 +493,7 @@ backdrop, cream/coral/teal/mustard palette, tabletop silhouette, central plaza,
 ring road, coral car, right-side route rail, and bottom instruction family.
 The above-the-fold copy gains only the user-requested “Shift + scroll to zoom”
 control hint. Production façades, street furniture, curb, crosswalk, local
-shadows, and the attributed car replace the former blockout deviations without
+shadows, and the original sports car replace the former blockout deviations without
 changing the accepted composition.
 
 ## Milestone 7 decisions
@@ -542,6 +542,9 @@ Pre-deployment validation completed on 2026-07-21:
   location buttons, opened About immediately, and replaced 3D-only help copy.
 - Browser console — no application errors; only the upstream Three.js `Clock`
   deprecation warning remains in the development dependency path.
+- Original car — the former 1.7 MB third-party model and its attribution were
+  removed. The 52 KB Draco-compressed sports coupe is authored entirely by the
+  project generator and preserves the existing one-way route behavior.
 
 ### Milestone 7 fidelity check
 

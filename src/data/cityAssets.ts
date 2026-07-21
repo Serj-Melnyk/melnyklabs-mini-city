@@ -12,7 +12,7 @@ export const cityAssetPaths: Record<LocationId, string> = {
 }
 
 export const guideAssetPath = fromPublic('assets/models/guide-character.glb')
-export const carAssetPath = fromPublic('assets/models/ignition-labs-car.glb')
+export const carAssetPath = fromPublic('assets/models/melnyklabs-sports-car.glb')
 export const dracoDecoderPath = fromPublic('draco/')
 
 export const productionAssetPaths = [

@@ -1,7 +1,7 @@
 import { Html, useGLTF } from '@react-three/drei'
 import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Box3, Color, Group, Vector3 } from 'three'
+import { Box3, Group, Vector3 } from 'three'
 import {
   createCarTrip,
   getCarTripDuration,
@@ -14,7 +14,7 @@ import { getLocation, type LocationId } from '../data/locations'
 import { carAssetPath } from '../data/cityAssets'
 import { carRuntime } from '../scene/carRuntime'
 import { useCityStore } from '../store/useCityStore'
-import { cloneModel, forEachStandardMaterial } from './modelUtils'
+import { cloneModel } from './modelUtils'
 import type { QualityMode } from '../data/quality'
 
 type NavigationCarProps = {
@@ -48,18 +48,6 @@ export function NavigationCar({ qualityMode, reducedMotion }: NavigationCarProps
     const scale = 1.48 / Math.max(size.x, size.z)
 
     model.position.set(-center.x, -bounds.min.y, -center.z)
-    forEachStandardMaterial(model, (material, mesh) => {
-      const name = mesh.name.toLowerCase()
-      material.map = null
-      material.roughness = name.includes('glass') ? 0.38 : 0.76
-      material.metalness = name.includes('glass') ? 0.08 : 0
-
-      if (name.includes('body')) material.color = new Color('#f26b4f')
-      if (name.includes('glass')) material.color = new Color('#172036')
-      if (name.includes('wheel')) material.color = new Color('#11182a')
-      material.needsUpdate = true
-    })
-
     return { model, scale }
   }, [carSource])
 
