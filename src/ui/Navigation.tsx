@@ -6,6 +6,7 @@ export function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false)
   const activeLocation = useCityStore((state) => state.activeLocation)
   const setActiveLocation = useCityStore((state) => state.setActiveLocation)
+  const setHoveredLocation = useCityStore((state) => state.setHoveredLocation)
 
   const navigate = (id: (typeof visibleLocations)[number]['id']) => {
     setActiveLocation(id)
@@ -33,6 +34,10 @@ export function Navigation() {
             type="button"
             aria-current={activeLocation === location.id ? 'page' : undefined}
             onClick={() => navigate(location.id)}
+            onFocus={() => setHoveredLocation(location.id)}
+            onBlur={() => setHoveredLocation(null)}
+            onPointerEnter={() => setHoveredLocation(location.id)}
+            onPointerLeave={() => setHoveredLocation(null)}
           >
             {location.navLabel}
           </button>

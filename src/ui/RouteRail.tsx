@@ -5,6 +5,7 @@ import type { CSSProperties } from 'react'
 export function RouteRail() {
   const activeLocation = useCityStore((state) => state.activeLocation)
   const setActiveLocation = useCityStore((state) => state.setActiveLocation)
+  const setHoveredLocation = useCityStore((state) => state.setHoveredLocation)
   const scrollProgress = useCityStore((state) => state.scrollProgress)
 
   return (
@@ -20,7 +21,13 @@ export function RouteRail() {
           aria-label={`Go to ${location.title}`}
           aria-current={activeLocation === location.id ? 'step' : undefined}
           onClick={() => setActiveLocation(location.id)}
-        />
+          onFocus={() => setHoveredLocation(location.id)}
+          onBlur={() => setHoveredLocation(null)}
+          onPointerEnter={() => setHoveredLocation(location.id)}
+          onPointerLeave={() => setHoveredLocation(null)}
+        >
+          <span>{location.shortTitle}</span>
+        </button>
       ))}
     </nav>
   )
