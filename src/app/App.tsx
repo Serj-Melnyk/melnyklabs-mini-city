@@ -9,6 +9,7 @@ import { RouteRail } from '../ui/RouteRail'
 import { useCityStore } from '../store/useCityStore'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { useCityNavigation } from '../hooks/useCityNavigation'
+import { useCityDeepLinks } from '../hooks/useCityDeepLinks'
 
 function canUseWebGL() {
   try {
@@ -28,6 +29,7 @@ export function App() {
   const scrollProgress = useCityStore((state) => state.scrollProgress)
   const reducedMotion = useReducedMotion()
   useCityNavigation()
+  useCityDeepLinks()
 
   return (
     <main className="app-shell">

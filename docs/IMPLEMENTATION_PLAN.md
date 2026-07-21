@@ -70,12 +70,23 @@ Acceptance criteria:
 
 ### Milestone 3 — Reusable interactions and content panels
 
-Status: **not started**
+Status: **complete**
 
-- Extract a generic interactive-object contract.
-- Add hover/focus/click highlight states and object tooltips.
-- Build complete About, Projects, Services, Lab, and Contact content.
-- Add responsive panel/bottom-sheet transitions and deep links.
+- [x] Extract a generic interactive-object contract.
+- [x] Add hover/focus/click highlight states and object tooltips.
+- [x] Build complete About, Projects, Services, Lab, and Contact content.
+- [x] Add responsive panel/bottom-sheet transitions and deep links.
+
+Acceptance criteria:
+
+- 3D objects, top navigation, and the route rail share one location state;
+- pointer hover and HTML focus reveal the same location highlight and tooltip;
+- every non-plaza stop has structured, readable HTML content;
+- panels work as a right-side desktop surface and mobile bottom sheet;
+- each location opens directly through a stable URL hash;
+- panel headings receive focus after intentional navigation and Escape closes
+  the panel;
+- no-WebGL visitors retain access to every content panel.
 
 ### Milestone 4 — Navigation car
 
@@ -171,7 +182,7 @@ environment asset request.
 
 ## Next milestone
 
-Implement only Milestone 3: reusable interactions and complete content panels.
+Implement only Milestone 4: the navigation car and its configured road route.
 Re-inspect the existing implementation and this plan first.
 
 ## Milestone 2 decisions
@@ -221,3 +232,50 @@ right-side route rail, and bottom instruction remain aligned. The
 above-the-fold copy diff is empty. Detailed façades and environmental props
 remain the intentional production-asset deviation already recorded in
 Milestone 1.
+
+## Milestone 3 decisions
+
+- `src/world/InteractiveObject.tsx` owns the shared pointer selection and hover
+  contract. Buildings now supply only geometry and visual response.
+- Keyboard focus on the top navigation and route rail updates the same hover
+  state as the canvas, so the object highlight and tooltip are not pointer-only.
+- Panel copy lives in `src/data/panelContent.ts`; components render structured
+  content without location-specific branches.
+- URL navigation uses deployment-safe hashes (`#about`, `#projects`,
+  `#services`, `#lab`, and `#contact`) instead of adding a router dependency.
+- The panel is a non-modal dialog: it focuses its heading after intentional
+  navigation, supports Escape, and becomes inert while closed.
+- Only the confirmed GitHub profile is linked. Email, LinkedIn, and Telegram
+  details were not invented and can be added when the owner supplies them.
+
+## Milestone 3 validation log
+
+Completed on 2026-07-21:
+
+- `npm run lint` — passed.
+- `npm run typecheck` — passed.
+- `npm run test` — passed, 9/9 tests across locations, camera routes, and deep
+  links.
+- `npm run build` — passed; 304.7 kB gzip with the known Three.js chunk-size
+  warning.
+- Desktop browser — primary Projects navigation opened the correct panel,
+  marked the navigation item current, and changed the URL to `#projects`.
+- Responsive browser — desktop uses a right-side scrollable panel; the narrow
+  viewport uses an in-frame bottom sheet with focused heading and accessible
+  close control.
+- Deep links — loading `#lab` directly opened Innovation Lab; Escape closed the
+  panel and applied `aria-hidden` plus `inert`.
+- Contact — the verified GitHub profile is exposed as a real external link.
+- Browser console — no application errors; one upstream Three.js deprecation
+  warning for `Clock` remains in the development dependency path.
+
+### Milestone 3 fidelity check
+
+The accepted concept and final browser capture were inspected together. The
+header hierarchy, exact hero copy, cream/coral/indigo palette, isometric city
+silhouette, right route rail, bottom instruction, and first-viewport content
+placement remain aligned. The above-the-fold copy diff is empty. The current
+scene intentionally keeps primitive façades and a simplified street/platform
+layout until Milestone 6; this is the same documented blockout deviation, not a
+new design direction. The richer information panels extend the concept without
+changing the landing composition.
