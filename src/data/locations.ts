@@ -27,7 +27,6 @@ export type CityLocation = {
     position: [number, number, number]
     compactPosition?: [number, number, number]
     accent?: string
-    distanceFactor?: number
   }
 }
 
@@ -128,7 +127,6 @@ export const locations: CityLocation[] = [
       description: 'Experiment. Learn. Ship.',
       position: [-0.2, 2.05, 0],
       compactPosition: [1.4, 2.05, 0],
-      distanceFactor: 12,
     },
   },
   {
@@ -151,7 +149,6 @@ export const locations: CityLocation[] = [
       description: "Let's connect.",
       position: [0, 2.4, 0],
       accent: '#8f91d8',
-      distanceFactor: 10,
     },
   },
 ]
