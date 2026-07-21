@@ -19,7 +19,7 @@ export function CityCanvas({ onReady, reducedMotion }: CityCanvasProps) {
       onCreated={onReady}
     >
       <CameraController reducedMotion={reducedMotion} />
-      <CityScene />
+      <CityScene reducedMotion={reducedMotion} />
     </Canvas>
   )
 }

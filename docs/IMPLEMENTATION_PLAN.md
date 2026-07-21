@@ -5,10 +5,10 @@ Last updated: 2026-07-21
 ## Architecture
 
 The application uses React + TypeScript + Vite. React Three Fiber owns the 3D
-canvas, Drei provides focused scene helpers, Zustand stores navigation state,
-and GSAP is reserved for later camera/vehicle timelines. Location coordinates,
-camera targets, content, and colors live in `src/data/locations.ts` rather than
-inside scene components.
+canvas, Drei provides focused scene helpers, and Zustand stores navigation
+state. The navigation car uses a frame-synchronized state machine so its motion
+and the demand-rendered camera advance together. Location coordinates, camera
+targets, content, and colors live in data modules rather than scene components.
 
 ```text
 src/
@@ -90,11 +90,23 @@ Acceptance criteria:
 
 ### Milestone 4 — Navigation car
 
-Status: **not started**
+Status: **complete**
 
-- Define road curve and configured stops.
-- Animate position/orientation with a small state machine.
-- Add follow camera and reduced-motion alternative.
+- [x] Define road curve and configured stops.
+- [x] Animate position/orientation with a small state machine.
+- [x] Add follow camera and reduced-motion alternative.
+
+Acceptance criteria:
+
+- every configured city stop maps to the closed ring road;
+- menu, route rail, panel actions, and the car itself can start a trip;
+- the car takes the shortest direction, rotates with the road tangent, and
+  reaches the exact configured destination;
+- the camera follows the moving car and returns to the location camera after
+  arrival;
+- destination content opens only after normal-motion arrival;
+- reduced-motion and no-WebGL navigation reveal content immediately;
+- an HTML live region communicates travelling and arrived states.
 
 ### Milestone 5 — Guide character
 
@@ -182,7 +194,8 @@ environment asset request.
 
 ## Next milestone
 
-Implement only Milestone 4: the navigation car and its configured road route.
+Implement only Milestone 5: the modular guide character and its accessible
+orientation cues.
 Re-inspect the existing implementation and this plan first.
 
 ## Milestone 2 decisions
@@ -279,3 +292,56 @@ scene intentionally keeps primitive façades and a simplified street/platform
 layout until Milestone 6; this is the same documented blockout deviation, not a
 new design direction. The richer information panels extend the concept without
 changing the landing composition.
+
+## Milestone 4 decisions
+
+- `src/data/carRoute.ts` owns the circular road geometry, derived stop
+  progress, shortest-path calculation, easing, speed, and navigation order.
+- `NavigationCar` keeps elapsed trip time and route progress in refs. No React
+  state is updated per animation frame.
+- The first GSAP draft was replaced during browser QA because its ticker could
+  remain paused in a throttled demand-rendered tab. The R3F delta-driven state
+  machine shares the scene clock and completes deterministically.
+- While driving, `carRuntime` exposes the actual world position and forward
+  vector to `CameraController`; it contains no UI state.
+- Normal motion closes an existing panel before travel and reopens destination
+  content after arrival. Reduced motion skips travel and opens it immediately.
+- Navigation remains immediate when WebGL is unavailable; the HTML fallback
+  never waits for a 3D component that was not mounted.
+- Clicking the visible car advances to the next configured city stop. The
+  persistent HTML navigation remains its keyboard-accessible equivalent.
+
+## Milestone 4 validation log
+
+Completed on 2026-07-21:
+
+- `npm run lint` — passed.
+- `npm run typecheck` — passed.
+- `npm run test` — passed, 15/15 tests across route geometry, store state,
+  deep links, locations, and camera checkpoints.
+- `npm run build` — passed with the known Three.js chunk-size warning.
+- Browser navigation — Contact drove from the plaza, announced travelling,
+  announced arrival, and opened Contact Station only after completion.
+- Car interaction — hovering the car showed `Next: Studio`; clicking the car
+  changed the URL to `#about` and arrived at Developer Studio.
+- Follow camera — the browser render changed to the moving-car camera during
+  travel and returned to the destination view after arrival.
+- Reduced motion — emulated `prefers-reduced-motion: reduce`; About arrived and
+  opened immediately without a timed trip.
+- Mobile 390×844 — the About bottom sheet measured 366×548.6 px and stayed
+  inside the 844 px viewport.
+- Native visual QA — captured at 1536×1024; the accepted reference is
+  1568×1003, and the in-app viewport could not reproduce both native
+  dimensions simultaneously.
+- Browser console — no application errors; only the existing upstream
+  Three.js `Clock` deprecation warning was present.
+
+### Milestone 4 fidelity check
+
+The accepted concept and final browser screenshot were inspected together.
+Header order, exact hero copy, CTA, indigo/cream/coral palette, tabletop city
+silhouette, ring road, coral car, right route rail, and bottom instruction stay
+aligned. The above-the-fold copy diff remains empty. Road markers and the more
+legible low-poly car move the blockout closer to the reference without adding
+new interface chrome. Detailed façades, street furniture, signs, and production
+models remain the intentional Milestone 6 deviation.

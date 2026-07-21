@@ -8,11 +8,16 @@ type CityState = {
   scrollProgress: number
   navigationSequence: number
   navigationRequest: { id: LocationId; token: number } | null
+  carStatus: 'idle' | 'driving' | 'arrived'
+  carDestination: LocationId
+  carEnabled: boolean
   setActiveLocation: (id: LocationId) => void
   syncActiveLocation: (id: LocationId) => void
   setHoveredLocation: (id: LocationId | null) => void
   setScrollProgress: (progress: number) => void
   completeNavigation: (token: number) => void
+  completeCarTrip: (id: LocationId) => void
+  setCarEnabled: (enabled: boolean) => void
   closePanel: () => void
 }
 
@@ -23,15 +28,20 @@ export const useCityStore = create<CityState>((set) => ({
   scrollProgress: 0,
   navigationSequence: 0,
   navigationRequest: null,
+  carStatus: 'idle',
+  carDestination: 'plaza',
+  carEnabled: true,
   setActiveLocation: (activeLocation) =>
     set((state) => {
       const token = state.navigationSequence + 1
 
       return {
         activeLocation,
-        isPanelOpen: activeLocation !== 'plaza',
+        isPanelOpen: state.carEnabled ? false : activeLocation !== 'plaza',
         navigationSequence: token,
         navigationRequest: { id: activeLocation, token },
+        carStatus: state.carEnabled ? 'driving' : 'arrived',
+        carDestination: activeLocation,
       }
     }),
   syncActiveLocation: (activeLocation) => set({ activeLocation }),
@@ -43,5 +53,19 @@ export const useCityStore = create<CityState>((set) => ({
         ? { navigationRequest: null }
         : state,
     ),
+  completeCarTrip: (id) =>
+    set((state) =>
+      state.carDestination === id
+        ? {
+            carStatus: 'arrived',
+            isPanelOpen: id !== 'plaza',
+          }
+        : state,
+    ),
+  setCarEnabled: (carEnabled) =>
+    set((state) => ({
+      carEnabled,
+      carStatus: carEnabled ? state.carStatus : 'arrived',
+    })),
   closePanel: () => set({ isPanelOpen: false }),
 }))
