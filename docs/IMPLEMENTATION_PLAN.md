@@ -545,6 +545,9 @@ Pre-deployment validation completed on 2026-07-21:
 - Original car — the former 1.7 MB third-party model and its attribution were
   removed. The 52 KB Draco-compressed sports coupe is authored entirely by the
   project generator and preserves the existing one-way route behavior.
+- Car heading — the original sports car is authored nose-first along local
+  `+X`. Removing the legacy imported-model quarter-turn aligns that axis with
+  the configured road tangent, so the car no longer travels sideways.
 
 ### Milestone 7 fidelity check
 
@@ -564,3 +567,18 @@ screenshot surface tiled or clipped the sticky 650svh page at that override.
 The stable visual comparison therefore uses the verified 1280×720 browser
 capture plus separate 390×844 responsive QA; this is the recorded native-size
 capture blocker, not an untested layout.
+
+### Detailed reference fidelity backlog
+
+The owner supplied `docs/design/melnyklabs-mini-city-reference.png` as the
+detailed production target. The first comparison is recorded in
+`design-qa.md`. The existing interaction architecture remains valid, but the
+next visual pass must close these reference gaps:
+
+- expand the city to the reference's denser seven-building composition;
+- represent the three project cards as three distinct project façades;
+- add crisp, non-essential façade labels while retaining all critical copy in
+  accessible HTML;
+- rebuild the connected curb, pavement, crosswalk, planter, and prop rhythm;
+- tune the overview camera, light balance, ambient occlusion, and material
+  contrast against the supplied 1568×1003 reference.

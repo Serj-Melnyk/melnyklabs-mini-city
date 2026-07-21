@@ -93,6 +93,10 @@ close button.
 
 The approved Milestone 1 visual reference is
 [`docs/design/melnyklabs-mini-city-concept.png`](design/melnyklabs-mini-city-concept.png).
+The detailed production target supplied on 2026-07-21 is
+[`docs/design/melnyklabs-mini-city-reference.png`](design/melnyklabs-mini-city-reference.png).
+It is the source of truth for the final city density, building inventory,
+façade signage, street detail, lighting balance, and first-viewport framing.
 
 ## Mobile and quality strategy
 

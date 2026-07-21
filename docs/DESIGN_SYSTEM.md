@@ -6,6 +6,11 @@ The source of truth for the first viewport is
 [`melnyklabs-mini-city-concept.png`](design/melnyklabs-mini-city-concept.png),
 generated as a desktop 16:10 concept before implementation.
 
+The detailed production reference is
+[`melnyklabs-mini-city-reference.png`](design/melnyklabs-mini-city-reference.png).
+Use it for the final city composition and asset-detail pass while preserving
+the accessible HTML interaction model established by the product concept.
+
 ## Design principles
 
 1. The city is the focal point; interface chrome stays quiet.
