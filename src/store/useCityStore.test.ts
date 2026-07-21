@@ -13,6 +13,8 @@ describe('navigation car state', () => {
       carStatus: 'idle',
       carDestination: 'plaza',
       carEnabled: true,
+      guideStatus: 'idle',
+      guideTarget: 'plaza',
     })
   })
 
@@ -34,5 +36,15 @@ describe('navigation car state', () => {
 
     expect(useCityStore.getState().carStatus).toBe('arrived')
     expect(useCityStore.getState().isPanelOpen).toBe(true)
+  })
+
+  it('publishes guide phases without changing navigation state', () => {
+    useCityStore.getState().setGuideState('walking', 'lab')
+    expect(useCityStore.getState().guideStatus).toBe('walking')
+    expect(useCityStore.getState().guideTarget).toBe('lab')
+    expect(useCityStore.getState().activeLocation).toBe('plaza')
+
+    useCityStore.getState().setGuideState('pointing', 'lab')
+    expect(useCityStore.getState().guideStatus).toBe('pointing')
   })
 })

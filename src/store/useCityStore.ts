@@ -11,6 +11,8 @@ type CityState = {
   carStatus: 'idle' | 'driving' | 'arrived'
   carDestination: LocationId
   carEnabled: boolean
+  guideStatus: 'idle' | 'walking' | 'pointing'
+  guideTarget: LocationId
   setActiveLocation: (id: LocationId) => void
   syncActiveLocation: (id: LocationId) => void
   setHoveredLocation: (id: LocationId | null) => void
@@ -18,6 +20,10 @@ type CityState = {
   completeNavigation: (token: number) => void
   completeCarTrip: (id: LocationId) => void
   setCarEnabled: (enabled: boolean) => void
+  setGuideState: (
+    status: 'idle' | 'walking' | 'pointing',
+    target: LocationId,
+  ) => void
   closePanel: () => void
 }
 
@@ -31,6 +37,8 @@ export const useCityStore = create<CityState>((set) => ({
   carStatus: 'idle',
   carDestination: 'plaza',
   carEnabled: true,
+  guideStatus: 'idle',
+  guideTarget: 'plaza',
   setActiveLocation: (activeLocation) =>
     set((state) => {
       const token = state.navigationSequence + 1
@@ -67,5 +75,7 @@ export const useCityStore = create<CityState>((set) => ({
       carEnabled,
       carStatus: carEnabled ? state.carStatus : 'arrived',
     })),
+  setGuideState: (guideStatus, guideTarget) =>
+    set({ guideStatus, guideTarget }),
   closePanel: () => set({ isPanelOpen: false }),
 }))

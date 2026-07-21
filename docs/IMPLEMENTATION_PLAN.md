@@ -110,11 +110,22 @@ Acceptance criteria:
 
 ### Milestone 5 — Guide character
 
-Status: **not started**
+Status: **complete**
 
-- Introduce a modular low-poly character.
-- Add Idle, Walk, and Point clips and transitions.
-- Keep all guidance duplicated in accessible HTML.
+- [x] Introduce a modular low-poly character.
+- [x] Add Idle, Walk, and Point states and transitions.
+- [x] Keep all guidance duplicated in accessible HTML.
+
+Acceptance criteria:
+
+- every location maps to a configured guide stop and point target;
+- the guide walks to the safe inner-plaza stop, turns, points, and returns to
+  idle without React state updates per frame;
+- clicking the guide previews the next direction without replacing the HTML
+  navigation;
+- menu and route navigation trigger the same guide orientation cue;
+- reduced motion uses an immediate static point pose;
+- an HTML live region communicates walking and pointing guidance.
 
 ### Milestone 6 — Production assets and scene polish
 
@@ -194,8 +205,8 @@ environment asset request.
 
 ## Next milestone
 
-Implement only Milestone 5: the modular guide character and its accessible
-orientation cues.
+Implement only Milestone 6: validate the blockout and replace approved
+primitives with optimized modular production assets.
 Re-inspect the existing implementation and this plan first.
 
 ## Milestone 2 decisions
@@ -345,3 +356,55 @@ aligned. The above-the-fold copy diff remains empty. Road markers and the more
 legible low-poly car move the blockout closer to the reference without adding
 new interface chrome. Detailed façades, street furniture, signs, and production
 models remain the intentional Milestone 6 deviation.
+
+## Milestone 5 decisions
+
+- `src/data/guideRoute.ts` owns guide stops, point targets, facing angles,
+  timing, and walk sampling; no scene component hardcodes city coordinates.
+- Stops stay inside the central plaza so the guide never clips through a
+  building or crosses the navigation car's ring road.
+- `GuideCharacter` uses a finite R3F state machine with refs. Idle is static,
+  while Walk and Point invalidate the demand-rendered canvas only for their
+  finite duration.
+- Clicking the guide previews the next direction but deliberately does not
+  navigate. The persistent HTML menu is the exact accessible action for
+  opening that destination.
+- Normal navigation triggers Walk then Point. Reduced motion places the guide
+  at the target immediately in a static point pose.
+- The character remains procedural primitive geometry for blockout validation;
+  authored GLB clips and final styling belong to Milestone 6.
+
+## Milestone 5 validation log
+
+Completed on 2026-07-21:
+
+- `npm run lint` — passed.
+- `npm run typecheck` — passed.
+- `npm run test` — passed, 19/19 tests across guide routing, car routing,
+  store state, deep links, locations, and camera checkpoints.
+- `npm run build` — passed with the known Three.js chunk-size warning.
+- Guide interaction — hover exposed `Point to Studio`; clicking the guide
+  announced walking without changing the URL or opening a panel.
+- State transition — clicking from the destination stop announced pointing
+  and named the matching About navigation control.
+- Reduced motion — Projects opened immediately and the guide announced a
+  static point toward Project District.
+- Mobile 390×844 — the guide and city stayed inside the responsive scene with
+  no horizontal overflow or broken layout.
+- Native visual QA — captured at 1536×1024; the accepted reference is
+  1568×1003, and the in-app viewport cannot reproduce both dimensions
+  simultaneously.
+- Browser console — no application errors; only the existing upstream
+  Three.js `Clock` deprecation warning was present.
+
+### Milestone 5 fidelity check
+
+The accepted concept and final browser screenshot were inspected together.
+Header order, exact hero copy, CTA, indigo/cream/coral palette, tabletop city
+silhouette, central guide placement, coral car, right route rail, and bottom
+instruction remain aligned. The above-the-fold copy diff is empty. The guide's
+cream/coral/navy palette and compact toy proportions match the reference
+family, while its visor and clearer limb separation are intentional blockout
+choices that make Walk and Point readable. Detailed façades, street furniture,
+signs, and authored character animation remain the planned Milestone 6
+deviation.
