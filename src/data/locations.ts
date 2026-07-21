@@ -17,9 +17,18 @@ export type CityLocation = {
   position: [number, number, number]
   size: [number, number, number]
   rotationY: number
+  modelScale?: number
   cameraPosition: [number, number, number]
   cameraTarget: [number, number, number]
   carStop: [number, number, number]
+  callout?: {
+    title: string
+    description: string
+    position: [number, number, number]
+    compactPosition?: [number, number, number]
+    accent?: string
+    distanceFactor?: number
+  }
 }
 
 export const locations: CityLocation[] = [
@@ -52,6 +61,11 @@ export const locations: CityLocation[] = [
     cameraPosition: [7.2, 6.6, 3.4],
     cameraTarget: [-2.8, 1.35, -7],
     carStop: [-1.75, 0.38, -4.36],
+    callout: {
+      title: 'Developer Studio',
+      description: 'Build. Code. Innovate.',
+      position: [0, 2.2, 0],
+    },
   },
   {
     id: 'projects',
@@ -67,6 +81,12 @@ export const locations: CityLocation[] = [
     cameraPosition: [12.7, 7, 2.6],
     cameraTarget: [5.6, 1, -4.2],
     carStop: [3.76, 0.38, -2.82],
+    callout: {
+      title: 'Project District 3',
+      description: 'Plan. Design. Deliver.',
+      position: [0.15, 2.55, 0],
+      compactPosition: [-1.25, 2.55, 0],
+    },
   },
   {
     id: 'services',
@@ -82,6 +102,12 @@ export const locations: CityLocation[] = [
     cameraPosition: [13.5, 7.1, 9.8],
     cameraTarget: [8, 0.8, 1.2],
     carStop: [4.65, 0.38, 0.7],
+    callout: {
+      title: 'Service Garage',
+      description: 'Support. Maintain. Improve.',
+      position: [0.2, 2.25, 0],
+      compactPosition: [-1.4, 2.25, 0],
+    },
   },
   {
     id: 'lab',
@@ -97,6 +123,13 @@ export const locations: CityLocation[] = [
     cameraPosition: [-11.2, 7.6, 13],
     cameraTarget: [-3.8, 0.7, 6.3],
     carStop: [-2.43, 0.38, 4.02],
+    callout: {
+      title: 'Innovation Lab',
+      description: 'Experiment. Learn. Ship.',
+      position: [-0.2, 2.05, 0],
+      compactPosition: [1.4, 2.05, 0],
+      distanceFactor: 12,
+    },
   },
   {
     id: 'contact',
@@ -106,12 +139,20 @@ export const locations: CityLocation[] = [
     description: 'The final stop for project ideas, collaborations and hello messages.',
     action: 'Start a conversation',
     color: '#f2866e',
-    position: [6.1, 1.1, 5.3],
+    position: [4.2, 1.1, 6.65],
     size: [2.8, 2.2, 2.4],
     rotationY: 0.14,
-    cameraPosition: [10.8, 7.1, 12.4],
-    cameraTarget: [6.1, 0.8, 5.3],
-    carStop: [3.55, 0.38, 3.08],
+    modelScale: 0.8,
+    cameraPosition: [9.7, 7.1, 14],
+    cameraTarget: [4.2, 0.8, 6.65],
+    carStop: [2.51, 0.38, 3.97],
+    callout: {
+      title: 'Contact Station',
+      description: "Let's connect.",
+      position: [0, 2.4, 0],
+      accent: '#8f91d8',
+      distanceFactor: 10,
+    },
   },
 ]
 
@@ -124,17 +165,30 @@ export const supplementalBuildings: CityLocation[] = [
     ...projectsLocation,
     title: 'Project District 1',
     shortTitle: 'Project 1',
-    position: [-6.6, 1.4, -4.1],
+    position: [-7, 1.4, -4.1],
     size: [3, 2.8, 2.4],
     rotationY: 0.52,
+    callout: {
+      title: 'Project District 1',
+      description: 'Ideas take shape.',
+      position: [-0.15, 2.65, 0],
+      accent: '#f28a43',
+    },
   },
   {
     ...projectsLocation,
     title: 'Project District 2',
     shortTitle: 'Project 2',
-    position: [-7.5, 1, 0.4],
+    position: [-8, 1, 0.5],
     size: [2.8, 2, 2.4],
     rotationY: 0.64,
+    callout: {
+      title: 'Project District 2',
+      description: 'Explore. Prototype. Test.',
+      position: [-0.2, 2.25, 0],
+      compactPosition: [1.6, 2.25, 0],
+      accent: '#6ed8c5',
+    },
   },
 ]
 

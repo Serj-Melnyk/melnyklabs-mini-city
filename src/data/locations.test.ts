@@ -54,4 +54,14 @@ describe('city locations', () => {
     expect(supplementalBuildings.every(({ id }) => id === 'projects')).toBe(true)
     expect(buildingLocations).toHaveLength(7)
   })
+
+  it('provides a complete hover callout for every visible building', () => {
+    expect(buildingLocations.every(({ callout }) => (
+      Boolean(callout?.title) &&
+      Boolean(callout?.description) &&
+      callout?.position.length === 3 &&
+      (callout?.compactPosition === undefined || callout.compactPosition.length === 3)
+    ))).toBe(true)
+    expect(new Set(buildingLocations.map(({ callout }) => callout?.title)).size).toBe(7)
+  })
 })

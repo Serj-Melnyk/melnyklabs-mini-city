@@ -97,6 +97,10 @@ The detailed production target supplied on 2026-07-21 is
 [`docs/design/melnyklabs-mini-city-reference.png`](design/melnyklabs-mini-city-reference.png).
 It is the source of truth for the final city density, building inventory,
 façade signage, street detail, lighting balance, and first-viewport framing.
+The approved interaction-state reference is
+[`docs/design/melnyklabs-hover-labels-reference.png`](design/melnyklabs-hover-labels-reference.png).
+It adds compact two-line callouts above hovered buildings and retains the
+original MelnykLabs guide character as part of the final city scene.
 
 ## Mobile and quality strategy
 

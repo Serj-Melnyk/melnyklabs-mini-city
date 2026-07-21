@@ -27,6 +27,7 @@ export function Building({ assetPath, location }: BuildingProps) {
           active={isActive}
           hovered={isHovered}
           model={model}
+          scale={location.modelScale ?? 1}
         />
       )}
     </InteractiveObject>
@@ -37,10 +38,12 @@ function ProductionBuildingModel({
   active,
   hovered,
   model,
+  scale,
 }: {
   active: boolean
   hovered: boolean
   model: ReturnType<typeof cloneModel>
+  scale: number
 }) {
   useEffect(() => {
     forEachStandardMaterial(model, (material) => {
@@ -61,7 +64,7 @@ function ProductionBuildingModel({
   }, [active, hovered, model])
 
   return (
-    <group scale={hovered ? 1.025 : 1}>
+    <group scale={scale * (hovered ? 1.025 : 1)}>
       <primitive object={model} />
     </group>
   )

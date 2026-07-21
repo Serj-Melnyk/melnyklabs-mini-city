@@ -11,6 +11,12 @@ The detailed production reference is
 Use it for the final city composition and asset-detail pass while preserving
 the accessible HTML interaction model established by the product concept.
 
+The building interaction-state reference is
+[`melnyklabs-hover-labels-reference.png`](design/melnyklabs-hover-labels-reference.png).
+On pointer hover, each building shows a dark two-line HTML callout with its
+own accent border and a short connector line. The label remains crisp, does
+not intercept pointer input, and identifies only the hovered building.
+
 ## Design principles
 
 1. The city is the focal point; interface chrome stays quiet.

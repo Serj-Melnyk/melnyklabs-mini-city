@@ -1,7 +1,7 @@
 # MelnykLabs Mini City
 
 An interactive low-poly 3D portfolio presented as a small tabletop city. The
-production scene includes five portfolio buildings, a central plaza, a one-way
+production scene includes seven portfolio buildings, a central plaza, a one-way
 navigation car, a guide character, guided camera travel, accessible HTML
 content, a contact workflow, and an automatic lightweight mode.
 
