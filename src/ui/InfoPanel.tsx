@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { panelContent, type PanelLocationId } from '../data/panelContent'
 import { getLocation } from '../data/locations'
 import { useCityStore } from '../store/useCityStore'
+import { ContactForm } from './ContactForm'
 
 function ArrowIcon() {
   return (
@@ -75,6 +76,8 @@ export function InfoPanel() {
             </article>
           ))}
         </div>
+
+        {activeLocation === 'contact' && <ContactForm />}
 
         <div className="panel-actions">
           {content.nextLocation && content.nextLabel && (

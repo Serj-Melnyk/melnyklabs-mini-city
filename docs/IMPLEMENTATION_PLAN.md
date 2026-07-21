@@ -100,8 +100,8 @@ Acceptance criteria:
 
 - every configured city stop maps to the closed ring road;
 - menu, route rail, panel actions, and the car itself can start a trip;
-- the car takes the shortest direction, rotates with the road tangent, and
-  reaches the exact configured destination;
+- the car follows the one-way ring road, rotates with the road tangent, and
+  reaches the exact configured destination without reversing;
 - the camera follows the moving car and returns to the location camera after
   arrival;
 - destination content opens only after normal-motion arrival;
@@ -129,21 +129,49 @@ Acceptance criteria:
 
 ### Milestone 6 — Production assets and scene polish
 
-Status: **not started**
+Status: **complete**
 
-- Validate the blockout before replacing primitives.
-- Export modular GLB assets from Blender.
-- Add compressed textures/models, instancing, and restrained effects.
-- Keep interactive buildings and characters as separate scene objects.
+- [x] Validate the blockout before replacing primitives.
+- [x] Export modular GLB assets from Blender.
+- [x] Add compressed models, instancing, and restrained scene polish.
+- [x] Keep interactive buildings, car, and character as separate scene objects.
+
+Acceptance criteria:
+
+- every primary location loads from its own modular GLB;
+- the guide and navigation car remain separate interactive objects;
+- authored city models stay within the 3–4 MB initial 3D budget;
+- repeated trees, lamps, and benches use instancing;
+- the loading screen remains visible until the suspended 3D asset tree mounts;
+- buildings stay outside the road and each configured car stop is curbside;
+- building foundations follow the matching position, dimensions, and rotation;
+- lint, typecheck, tests, build, and browser interaction checks pass.
 
 ### Milestone 7 — Optimization, accessibility, and release
 
-Status: **not started**
+Status: **in progress**
 
-- Implement device quality selection and lightweight mode.
-- Audit keyboard, screen-reader, reduced-motion, and no-WebGL paths.
-- Test target browsers/devices and slow-network behavior.
-- Add production metadata, analytics decision, deployment, and domain.
+- [x] Implement device quality selection and lightweight mode.
+- [x] Add a functional contact-form workflow with a no-transmission fallback.
+- [x] Audit keyboard, screen-reader, reduced-motion, and no-WebGL paths.
+- [x] Test desktop, mobile, production-base, and slow-resource loading behavior.
+- [x] Add production metadata, local fonts, manifest, favicon, and social image.
+- [x] Add a validated GitHub Pages deployment workflow.
+- [ ] Publish, deploy, and verify the public URL.
+- [ ] Connect a private contact endpoint after the owner provides one.
+
+Acceptance criteria:
+
+- compact, coarse-pointer, save-data, and constrained devices select `light`;
+- lightweight mode uses DPR 1, removes dynamic shadows and secondary props,
+  skips the guide model, and shortens car travel without hiding HTML content;
+- the contact form validates all required fields and either posts to the
+  configured endpoint or copies a complete portable inquiry locally;
+- reduced motion, keyboard navigation, semantic panels, and forced HTML mode
+  keep every portfolio stop accessible;
+- the initial application shell is code-split from the 3D engine;
+- production metadata and all assets resolve under the repository Pages base;
+- the public deployment passes the same validation and browser smoke tests.
 
 ## Milestone 1 decisions
 
@@ -205,8 +233,8 @@ environment asset request.
 
 ## Next milestone
 
-Implement only Milestone 6: validate the blockout and replace approved
-primitives with optimized modular production assets.
+Implement only Milestone 7: finish device quality selection, accessibility,
+contact workflow, production metadata, deployment, and release verification.
 Re-inspect the existing implementation and this plan first.
 
 ## Milestone 2 decisions
@@ -306,8 +334,8 @@ changing the landing composition.
 
 ## Milestone 4 decisions
 
-- `src/data/carRoute.ts` owns the circular road geometry, derived stop
-  progress, shortest-path calculation, easing, speed, and navigation order.
+- `src/data/carRoute.ts` owns the circular one-way road geometry, derived stop
+  progress, forward-only trip calculation, easing, speed, and navigation order.
 - `NavigationCar` keeps elapsed trip time and route progress in refs. No React
   state is updated per animation frame.
 - The first GSAP draft was replaced during browser QA because its ticker could
@@ -371,8 +399,9 @@ models remain the intentional Milestone 6 deviation.
   opening that destination.
 - Normal navigation triggers Walk then Point. Reduced motion places the guide
   at the target immediately in a static point pose.
-- The character remains procedural primitive geometry for blockout validation;
-  authored GLB clips and final styling belong to Milestone 6.
+- The character remained procedural primitive geometry during blockout
+  validation; its modular production GLB was introduced in Milestone 6 while
+  preserving the proven code-driven state machine.
 
 ## Milestone 5 validation log
 
@@ -408,3 +437,127 @@ family, while its visor and clearer limb separation are intentional blockout
 choices that make Walk and Point readable. Detailed façades, street furniture,
 signs, and authored character animation remain the planned Milestone 6
 deviation.
+
+## Milestone 6 decisions
+
+- Production buildings, plaza landmark, and guide character are generated as
+  separate Blender-authored GLBs by `tools/blender/generate_city_assets.py`.
+  `npm run assets:generate` makes the asset build reproducible.
+- Blender 3.6 LTS is used by the generation script on the current macOS host;
+  newer Blender builds could not import their bundled NumPy extension on this
+  OS version.
+- Exported city assets use Draco geometry compression and local decoder files,
+  avoiding a runtime dependency on a third-party CDN.
+- The navigation car uses the supplied Ignition Labs CC BY 3.0 model from Poly
+  Pizza. Runtime normalization and material overrides keep it consistent with
+  the city palette; attribution is recorded in `ATTRIBUTIONS.md` and shown in
+  Contact Station.
+- Trees, lamp posts, bulbs, and benches are instanced. The scene keeps one
+  directional shadow source plus restrained ambient fill and no post-processing.
+- Buildings moved beyond the outer curb and rotate toward the road. Car stops
+  share each building's radial angle, and short driveways connect the curb to
+  the matching rotated foundation.
+- The road is one-way: navigation always advances forward around the ring. A
+  destination behind the current stop is reached by continuing through the
+  city rather than reversing.
+- `Shift + wheel` adjusts camera distance between safe limits while normal
+  wheel input remains reserved for the guided journey.
+
+## Milestone 6 validation log
+
+Completed on 2026-07-21:
+
+- `npm run lint` — passed.
+- `npm run typecheck` — passed.
+- `npm run test` — passed, 25/25 tests across assets, road clearance, routes,
+  deep links, store state, and camera checkpoints.
+- `npm run build` — passed with the known Three.js chunk-size warning.
+- Asset budget — eight GLBs total 2,023,892 bytes, below the 3–4 MB initial
+  resource budget; all city-authored GLBs are Draco-compressed.
+- Browser loading — the branded loading screen remained until the suspended
+  model subtree resolved.
+- Road layout — every building rendered beyond the outer curb; the car drove
+  on the ring and stopped curbside without intersecting a façade.
+- One-way travel — selecting a previous angular stop used a positive forward
+  trip around the closed route; the car never reversed.
+- Foundation alignment — all five building foundations were checked after
+  applying each location's configured rotation; the Lab close-up confirmed the
+  platform follows the building footprint.
+- Camera distance — a native shifted wheel event visibly changed the Lab view
+  from a close-up to a complete-city framing while preserving normal scroll.
+
+### Milestone 6 fidelity check
+
+The production render keeps the approved header, hero copy, CTA, dark indigo
+backdrop, cream/coral/teal/mustard palette, tabletop silhouette, central plaza,
+ring road, coral car, right-side route rail, and bottom instruction family.
+The above-the-fold copy gains only the user-requested “Shift + scroll to zoom”
+control hint. Production façades, street furniture, curb, crosswalk, local
+shadows, and the attributed car replace the former blockout deviations without
+changing the accepted composition.
+
+## Milestone 7 decisions
+
+- `src/data/quality.ts` selects `full` or `light` from viewport width,
+  coarse-pointer input, hardware concurrency, device memory, and save-data.
+  `?quality=full` and `?quality=light` provide deterministic overrides.
+- Lightweight mode uses DPR 1, disables antialiasing and dynamic shadows,
+  removes the guide and secondary street furniture, keeps four plaza trees,
+  and runs car trips at 55% of the full duration.
+- The HTML application shell and local Inter font load separately from the lazy
+  Three.js canvas chunk, so visitors receive navigation and loading feedback
+  before the 3D engine is parsed.
+- Contact Station validates a real form. With `VITE_CONTACT_ENDPOINT`, it sends
+  a JSON inquiry; without a private endpoint, it copies the full message
+  locally and explicitly states that no form data leaves the page.
+- `?mode=html` exposes the complete no-WebGL experience intentionally as well
+  as serving the automatic fallback path.
+- Analytics are intentionally omitted from the first release: the site has no
+  consent requirement, tracking dependency, or invented measurement goal.
+- Deployment targets the repository's GitHub Pages path and pins the official
+  Pages actions used by the current Vite deployment guide.
+
+## Milestone 7 validation log
+
+Pre-deployment validation completed on 2026-07-21:
+
+- `npm run lint` — passed.
+- `npm run typecheck` — passed.
+- `npm test -- --run` — passed, 30/30 tests across nine suites.
+- `npm run build` — passed; the HTML shell is 67.9 kB gzip and the lazy 3D
+  chunk is 263.7 kB gzip. The expected warning is isolated to the deferred
+  Three.js chunk rather than the initial shell.
+- `npm run build -- --base=/melnyklabs-mini-city/` — passed; HTML, JS, CSS,
+  fonts, GLBs, Draco decoders, favicon, and manifest resolve under the Pages
+  base. A local production preview loaded the complete model tree.
+- Desktop — verified at 1280×720 in Browser/IAB; the platform, navigation,
+  hero, route rail, and bottom controls remain in view.
+- Mobile — verified at 390×844; `data-quality="light"` was selected and the
+  Contact bottom sheet remained inside the viewport with its form scrollable.
+- Contact — native field labels and validation were exposed; the fallback
+  created the complete inquiry and confirmed it in a polite live region.
+- Reduced motion — emulated `reduce`; the car arrived immediately, the guide
+  used a static point state, and the destination panel opened after assets.
+- HTML fallback — `?mode=html` removed the canvas, exposed all five direct
+  location buttons, opened About immediately, and replaced 3D-only help copy.
+- Browser console — no application errors; only the upstream Three.js `Clock`
+  deprecation warning remains in the development dependency path.
+
+### Milestone 7 fidelity check
+
+The approved concept at `docs/design/melnyklabs-mini-city-concept.png` and the
+latest Browser/IAB render were inspected together with `view_image`. Header
+brand and navigation order, exact hero copy and CTA, indigo/cream/coral palette,
+tabletop silhouette, central monument, ring road, car, right route rail, and
+bottom instruction placement remain aligned. The city framing was enlarged,
+fog moved farther away, and overlay opacity reduced after comparison so the
+diorama regains the reference's visual weight and brightness. The
+above-the-fold copy diff contains one intentional user-requested addition:
+“Shift + scroll to zoom.” Building labels remain omitted intentionally because
+portfolio copy stays accessible in HTML instead of being baked into WebGL.
+
+Browser/IAB accepted the 1568×1003 emulated CSS viewport, but its native
+screenshot surface tiled or clipped the sticky 650svh page at that override.
+The stable visual comparison therefore uses the verified 1280×720 browser
+capture plus separate 390×844 responsive QA; this is the recorded native-size
+capture blocker, not an untested layout.

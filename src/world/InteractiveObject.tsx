@@ -25,6 +25,7 @@ export function InteractiveObject({ location, children }: InteractiveObjectProps
   return (
     <group
       position={location.position}
+      rotation={[0, location.rotationY, 0]}
       onClick={selectLocation}
       onPointerEnter={(event) => {
         event.stopPropagation()

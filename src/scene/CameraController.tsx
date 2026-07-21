@@ -14,13 +14,19 @@ const horizontalLookLimit = MathUtils.degToRad(12)
 const verticalLookLimit = MathUtils.degToRad(6)
 
 export function CameraController({ reducedMotion }: CameraControllerProps) {
-  const { camera, invalidate } = useThree()
+  const { camera, invalidate, size } = useThree()
   const lookTarget = useRef(new Vector3())
   const desiredPosition = useRef(new Vector3())
   const desiredTarget = useRef(new Vector3())
   const offset = useRef(new Vector3())
   const spherical = useRef(new Spherical())
   const pointer = useRef({ x: 0, y: 0 })
+  const viewportAspect = size.width / Math.max(size.height, 1)
+  const responsiveDistance = viewportAspect > 1.65
+    ? 1.18
+    : viewportAspect < 0.9
+      ? 1.18
+      : 1
 
   useLayoutEffect(() => {
     const initial = sampleCameraRoute(useCityStore.getState().scrollProgress)
@@ -75,6 +81,21 @@ export function CameraController({ reducedMotion }: CameraControllerProps) {
     }
   }, [invalidate, reducedMotion])
 
+  useEffect(() => {
+    const handleWheelZoom = (event: WheelEvent) => {
+      if (!event.shiftKey) return
+      event.preventDefault()
+      const wheelDelta = Math.abs(event.deltaY) >= Math.abs(event.deltaX)
+        ? event.deltaY
+        : event.deltaX
+      useCityStore.getState().adjustViewDistance(wheelDelta)
+      invalidate()
+    }
+
+    window.addEventListener('wheel', handleWheelZoom, { passive: false })
+    return () => window.removeEventListener('wheel', handleWheelZoom)
+  }, [invalidate])
+
   useFrame((_, delta) => {
     const cityState = useCityStore.getState()
     const followsCar =
@@ -107,6 +128,7 @@ export function CameraController({ reducedMotion }: CameraControllerProps) {
     }
 
     offset.current.setFromSpherical(spherical.current)
+    offset.current.multiplyScalar(cityState.viewDistance * responsiveDistance)
     desiredPosition.current.copy(desiredTarget.current).add(offset.current)
 
     const damping = reducedMotion ? 1000 : 5.5

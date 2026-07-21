@@ -1,7 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
 :root {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #fff0d3;
   background: #07142b;
   font-synthesis: none;
@@ -29,7 +27,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--focus); outline
 .app-shell { position: relative; height: 650svh; background: var(--ink-950); }
 .experience-shell { position: sticky; top: 0; min-height: 100svh; overflow: hidden; background: var(--ink-950); }
 .scene-shell, .scene-shell canvas { position: absolute !important; inset: 0; width: 100% !important; height: 100% !important; }
-.scene-shell::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(7,20,43,.52) 0%, transparent 32%), linear-gradient(0deg, rgba(7,20,43,.64) 0%, transparent 42%); }
+.scene-shell::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(7,20,43,.36) 0%, transparent 30%), linear-gradient(0deg, rgba(7,20,43,.38) 0%, transparent 38%); }
 
 .skip-link { position: fixed; top: 12px; left: 50%; z-index: 30; padding: 10px 16px; color: var(--ink-950); background: var(--cream-100); transform: translate(-50%, -180%); transition: transform 180ms ease; }
 .skip-link:focus { transform: translate(-50%, 0); }
@@ -75,6 +73,19 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--focus); outline
 .panel-item h3 { margin: 0; font-size: .92rem; letter-spacing: -.02em; }
 .panel-item p { margin: 6px 0 0; color: var(--cream-200); font-size: .8rem; line-height: 1.5; }
 .panel-item .panel-meta { margin-top: 5px; color: var(--coral-300); font-size: .65rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.contact-form { display: grid; gap: 14px; margin-top: 22px; padding: 20px; border: 1px solid rgba(255,240,211,.14); border-radius: 16px; background: rgba(255,240,211,.035); }
+.contact-form-heading h3 { margin: 0; font-size: 1rem; letter-spacing: -.025em; }
+.contact-form-heading p { margin: 6px 0 0; color: var(--cream-200); font-size: .72rem; line-height: 1.5; }
+.contact-form label { display: grid; gap: 6px; color: var(--cream-200); font-size: .7rem; font-weight: 600; }
+.contact-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.contact-form input, .contact-form select, .contact-form textarea { width: 100%; min-width: 0; border: 1px solid rgba(255,240,211,.2); border-radius: 9px; background: rgba(7,20,43,.78); color: var(--cream-100); font: 500 .8rem/1.4 "Inter Variable", Inter, ui-sans-serif, system-ui, sans-serif; }
+.contact-form input, .contact-form select { min-height: 42px; padding: 0 11px; }
+.contact-form textarea { resize: vertical; min-height: 104px; padding: 10px 11px; }
+.contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { border-color: var(--focus); outline: 2px solid rgba(127,229,211,.2); outline-offset: 1px; }
+.contact-form button { min-height: 44px; border: 1px solid var(--cream-100); border-radius: 11px; background: var(--coral-500); color: var(--cream-100); font-size: .8rem; font-weight: 700; cursor: pointer; }
+.contact-form button:hover { background: var(--coral-300); }
+.contact-form button:disabled { cursor: wait; opacity: .68; }
+.contact-form-status { min-height: 1.2em; margin: 0; color: var(--cream-200); font-size: .72rem; line-height: 1.5; }
 .panel-actions { display: flex; flex-wrap: wrap; gap: 18px 24px; padding-top: 22px; }
 .text-action { display: inline-flex; align-items: center; gap: 10px; padding: 0 0 4px; border: 0; border-bottom: 1px solid currentColor; background: transparent; color: var(--cream-100); font-weight: 700; text-decoration: none; cursor: pointer; }
 .object-tooltip-anchor { user-select: none; }
@@ -108,10 +119,12 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--focus); outline
   .route-rail { right: 18px; }
   .help-hint { bottom: 18px; width: max-content; max-width: calc(100% - 40px); }
   .help-hint span:first-child { display: none; }
+  .help-hint .zoom-hint { display: none; }
   .help-hint span + span::before { content: none; }
   .info-panel { top: auto; right: 12px; bottom: 12px; left: 12px; width: auto; max-height: min(65svh, 620px); transform: translateY(24px); }
   .info-panel.is-open { transform: translateY(0); }
   .panel-scroll { max-height: min(65svh, 620px); padding: 26px; }
+  .contact-field-row { grid-template-columns: 1fr; }
   .panel-close { top: 12px; right: 14px; }
   .route-rail button span { display: none; }
 }

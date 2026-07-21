@@ -1,0 +1,17 @@
+{
+  "name": "MelnykLabs Mini City",
+  "short_name": "MelnykLabs",
+  "description": "An interactive low-poly portfolio city for digital products, experiments, and ideas.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#07142b",
+  "theme_color": "#07142b",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

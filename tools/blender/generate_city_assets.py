@@ -1,0 +1,412 @@
+"""Generate the reproducible low-poly GLB asset set for MelnykLabs Mini City.
+
+Run from the repository root:
+
+    blender --background --python tools/blender/generate_city_assets.py
+
+The generated models intentionally use geometry and embedded materials only. This keeps
+the production payload small, avoids texture seams, and preserves the matte toy
+diorama look of the approved concept. The navigation car is the attributed
+Ignition Labs asset supplied separately in ``public/assets/models``.
+"""
+
+from pathlib import Path
+import math
+
+import bpy
+
+
+ROOT = Path(__file__).resolve().parents[2]
+OUTPUT = ROOT / "public" / "assets" / "models"
+OUTPUT.mkdir(parents=True, exist_ok=True)
+
+
+PALETTE = {
+    "ink": "#142039",
+    "ink_dark": "#081329",
+    "cream": "#FFF0D3",
+    "cream_dark": "#D7C7AA",
+    "coral": "#F26B4F",
+    "coral_light": "#FF9A7F",
+    "mint": "#6ED8C5",
+    "mint_dark": "#3F8F8A",
+    "mustard": "#E4AD52",
+    "mustard_dark": "#A86F32",
+    "lavender": "#777994",
+    "lavender_dark": "#50536E",
+    "green": "#788954",
+    "wood": "#735041",
+    "glass": "#203956",
+    "glass_light": "#7FD5D0",
+    "skin": "#9B644A",
+    "white": "#F7F3E8",
+}
+
+
+def hex_rgba(value: str, alpha: float = 1.0):
+    value = value.lstrip("#")
+    srgb = tuple(int(value[index:index + 2], 16) / 255 for index in (0, 2, 4))
+
+    def to_scene_linear(channel):
+        if channel <= 0.04045:
+            return channel / 12.92
+        return ((channel + 0.055) / 1.055) ** 2.4
+
+    return tuple(to_scene_linear(channel) for channel in srgb) + (alpha,)
+
+
+def web_location(location):
+    """Convert Three.js x/y/z coordinates to Blender x/y/z coordinates."""
+    x, y, z = location
+    return (x, -z, y)
+
+
+def reset_scene():
+    bpy.ops.object.select_all(action="SELECT")
+    bpy.ops.object.delete(use_global=False)
+    for data in (bpy.data.meshes, bpy.data.curves, bpy.data.materials, bpy.data.cameras, bpy.data.lights):
+        for block in list(data):
+            data.remove(block)
+
+
+def material(name, color, *, roughness=0.84, metallic=0.0, emission=None, alpha=1.0):
+    result = bpy.data.materials.new(name)
+    result.use_nodes = True
+    result.diffuse_color = hex_rgba(color, alpha)
+    shader = result.node_tree.nodes.get("Principled BSDF")
+    shader.inputs["Base Color"].default_value = hex_rgba(color, alpha)
+    shader.inputs["Roughness"].default_value = roughness
+    shader.inputs["Metallic"].default_value = metallic
+    if emission:
+        emission_input = shader.inputs.get("Emission Color") or shader.inputs.get("Emission")
+        emission_input.default_value = hex_rgba(emission)
+        shader.inputs["Emission Strength"].default_value = 0.18
+    if alpha < 1:
+        shader.inputs["Alpha"].default_value = alpha
+        result.surface_render_method = "DITHERED"
+    return result
+
+
+def finish_object(obj, mat=None, bevel=0.0):
+    if mat:
+        obj.data.materials.append(mat)
+    if bevel:
+        modifier = obj.modifiers.new("Soft toy edges", "BEVEL")
+        modifier.width = bevel
+        modifier.segments = 2
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.modifier_apply(modifier=modifier.name)
+    return obj
+
+
+def box(name, size, location=(0, 0, 0), mat=None, bevel=0.0, rotation=(0, 0, 0)):
+    bpy.ops.mesh.primitive_cube_add(location=web_location(location), rotation=rotation)
+    obj = bpy.context.object
+    obj.name = name
+    obj.dimensions = (size[0], size[2], size[1])
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    return finish_object(obj, mat, bevel)
+
+
+def cylinder(name, radius, depth, location=(0, 0, 0), mat=None, vertices=12, rotation=(0, 0, 0), bevel=0.0):
+    bpy.ops.mesh.primitive_cylinder_add(
+        vertices=vertices,
+        radius=radius,
+        depth=depth,
+        location=web_location(location),
+        rotation=rotation,
+    )
+    obj = bpy.context.object
+    obj.name = name
+    return finish_object(obj, mat, bevel)
+
+
+def sphere(name, radius, location=(0, 0, 0), mat=None, subdivisions=1):
+    bpy.ops.mesh.primitive_ico_sphere_add(
+        subdivisions=subdivisions,
+        radius=radius,
+        location=web_location(location),
+    )
+    obj = bpy.context.object
+    obj.name = name
+    return finish_object(obj, mat)
+
+
+def empty(name, location=(0, 0, 0)):
+    obj = bpy.data.objects.new(name, None)
+    bpy.context.collection.objects.link(obj)
+    obj.location = web_location(location)
+    return obj
+
+
+def parent_keep_world(child, parent):
+    matrix = child.matrix_world.copy()
+    child.parent = parent
+    child.matrix_world = matrix
+
+
+def window_row(width, height, z, count, depth, mat, prefix="Window"):
+    gap = 0.16
+    pane_width = (width - gap * (count + 1)) / count
+    start = -width / 2 + gap + pane_width / 2
+    for index in range(count):
+        x = start + index * (pane_width + gap)
+        box(
+            f"{prefix}_{index + 1}",
+            (pane_width, height, 0.08),
+            (x, z, depth),
+            mat,
+            bevel=0.025,
+        )
+
+
+def planter(x, y, z, pot, leaves, name):
+    box(f"{name}_Pot", (0.42, 0.28, 0.3), (x, y, z), pot, bevel=0.05)
+    for index, offset in enumerate((-0.12, 0.0, 0.12)):
+        sphere(f"{name}_Leaf_{index}", 0.16, (x + offset, y + 0.25, z), leaves)
+
+
+def export_asset(filename):
+    for obj in bpy.context.scene.objects:
+        if obj.type == "MESH":
+            obj.select_set(True)
+    kwargs = {
+        "filepath": str(OUTPUT / filename),
+        "export_format": "GLB",
+        "export_yup": True,
+        "export_apply": True,
+        "export_materials": "EXPORT",
+        "export_cameras": False,
+        "export_lights": False,
+    }
+    properties = bpy.ops.export_scene.gltf.get_rna_type().properties.keys()
+    if "export_draco_mesh_compression_enable" in properties:
+        kwargs.update({
+            "export_draco_mesh_compression_enable": True,
+            "export_draco_mesh_compression_level": 6,
+            "export_draco_position_quantization": 14,
+            "export_draco_normal_quantization": 10,
+        })
+    bpy.ops.export_scene.gltf(**kwargs)
+    print(f"Exported {filename}")
+
+
+def build_plaza():
+    reset_scene()
+    stone = material("Plaza stone", PALETTE["cream_dark"])
+    pale = material("Monument", PALETTE["cream"])
+    water = material("Water", PALETTE["mint"], roughness=0.45, metallic=0.05)
+    cylinder("OctagonalPlinth", 1.15, 0.34, (0, -0.18, 0), stone, vertices=8, bevel=0.06)
+    cylinder("WaterBasin", 0.83, 0.16, (0, 0.03, 0), pale, vertices=16, bevel=0.04)
+    cylinder("WaterSurface", 0.67, 0.035, (0, 0.13, 0), water, vertices=24)
+    cylinder("ObeliskBase", 0.31, 0.32, (0, 0.3, 0), stone, vertices=8, bevel=0.035)
+    box("Obelisk", (0.28, 1.42, 0.28), (0, 1.12, 0), pale, bevel=0.035)
+    bpy.ops.mesh.primitive_cone_add(
+        vertices=4,
+        radius1=0.2,
+        radius2=0.0,
+        depth=0.38,
+        location=web_location((0, 2.02, 0)),
+        rotation=(0, 0, math.radians(45)),
+    )
+    finish_object(bpy.context.object, pale)
+    export_asset("plaza-landmark.glb")
+
+
+def build_studio():
+    reset_scene()
+    navy = material("Studio navy", PALETTE["ink"])
+    teal = material("Studio teal", PALETTE["mint"])
+    trim = material("Cream trim", PALETTE["cream"])
+    glass = material("Studio glass", PALETTE["glass"], roughness=0.36, metallic=0.08, emission=PALETTE["glass_light"])
+    green = material("Planter leaves", PALETTE["green"])
+    wood = material("Planter", PALETTE["wood"])
+    box("StudioBody", (3.2, 3.0, 2.4), (0, 0, 0), navy, bevel=0.14)
+    box("StudioTealFrame", (3.34, 0.2, 2.54), (0, 1.38, 0), teal, bevel=0.06)
+    box("StudioRoof", (2.76, 0.28, 1.96), (0, 1.64, 0), trim, bevel=0.08)
+    box("StudioDoor", (0.68, 1.0, 0.12), (0, -0.98, 1.23), glass, bevel=0.03)
+    window_row(2.5, 0.62, 0.5, 3, 1.23, glass, "StudioUpperWindow")
+    window_row(2.5, 0.54, -0.45, 3, 1.23, glass, "StudioLowerWindow")
+    box("CodeSign", (0.86, 0.62, 0.1), (0, 0.58, 1.31), teal, bevel=0.08)
+    box("CodeSlash", (0.08, 0.38, 0.06), (0, 0.58, 1.38), trim, bevel=0.02, rotation=(0, math.radians(18), 0))
+    planter(-1.05, -1.32, 1.24, wood, green, "StudioPlanterLeft")
+    planter(1.05, -1.32, 1.24, wood, green, "StudioPlanterRight")
+    export_asset("developer-studio.glb")
+
+
+def build_projects():
+    reset_scene()
+    mustard = material("Project mustard", PALETTE["mustard"])
+    deep = material("Project shadow", PALETTE["mustard_dark"])
+    cream = material("Project cream", PALETTE["cream"])
+    coral = material("Project coral", PALETTE["coral_light"])
+    glass = material("Project glass", PALETTE["glass"], roughness=0.4)
+    green = material("Project plants", PALETTE["green"])
+    wood = material("Project planters", PALETTE["wood"])
+    box("ProjectBody", (2.8, 2.3, 2.4), (0, 0, 0), mustard, bevel=0.14)
+    box("ProjectCornice", (3.02, 0.28, 2.58), (0, 1.05, 0), deep, bevel=0.06)
+    box("ProjectRoof", (2.48, 0.24, 2.0), (0, 1.33, 0), cream, bevel=0.07)
+    box("ProjectSign", (2.0, 0.58, 0.11), (0, 0.5, 1.25), deep, bevel=0.06)
+    box("ProjectDoor", (0.62, 0.9, 0.1), (0.46, -0.7, 1.24), glass, bevel=0.03)
+    box("ProjectWindow", (1.05, 0.66, 0.1), (-0.55, -0.62, 1.24), glass, bevel=0.03)
+    for index, x in enumerate((-0.92, -0.46, 0.0, 0.46, 0.92)):
+        awning_mat = cream if index % 2 == 0 else coral
+        box(f"Awning_{index}", (0.46, 0.18, 0.64), (x, -0.16, 1.48), awning_mat, bevel=0.035, rotation=(math.radians(-10), 0, 0))
+    planter(-0.92, -0.98, 1.27, wood, green, "ProjectPlanterLeft")
+    planter(0.92, -0.98, 1.27, wood, green, "ProjectPlanterRight")
+    export_asset("project-district.glb")
+
+
+def build_garage():
+    reset_scene()
+    lavender = material("Garage lavender", PALETTE["lavender"])
+    dark = material("Garage dark", PALETTE["lavender_dark"])
+    cream = material("Garage trim", PALETTE["cream"])
+    coral = material("Garage marker", PALETTE["coral"])
+    box("GarageBody", (3.0, 2.0, 2.4), (0, 0, 0), lavender, bevel=0.13)
+    box("GarageRoof", (3.18, 0.25, 2.56), (0, 1.04, 0), dark, bevel=0.06)
+    box("GarageDoor", (1.72, 1.12, 0.12), (-0.32, -0.38, 1.24), dark, bevel=0.035)
+    for index in range(5):
+        box(f"GarageDoorSlat_{index}", (1.55, 0.035, 0.025), (-0.32, -0.8 + index * 0.24, 1.32), cream)
+    box("GarageSign", (2.06, 0.42, 0.1), (0, 0.62, 1.25), cream, bevel=0.05)
+    box("WrenchStem", (0.12, 0.46, 0.08), (0.72, 0.64, 1.33), dark, bevel=0.025, rotation=(0, math.radians(-28), 0))
+    cylinder("WrenchHead", 0.16, 0.08, (0.83, 0.84, 1.34), dark, vertices=8, rotation=(math.pi / 2, 0, 0))
+    for index, x in enumerate((0.75, 1.05, 1.33)):
+        cylinder(f"Bollard_{index}", 0.09, 0.5, (x, -0.7, 1.33), coral if index == 1 else cream, vertices=12, bevel=0.02)
+    export_asset("service-garage.glb")
+
+
+def build_lab():
+    reset_scene()
+    teal = material("Lab teal", PALETTE["mint_dark"])
+    mint = material("Lab mint", PALETTE["mint"])
+    dark = material("Lab dark", PALETTE["ink"])
+    glass = material("Lab glass", PALETTE["glass"], roughness=0.3, metallic=0.1, emission=PALETTE["glass_light"])
+    cream = material("Lab trim", PALETTE["cream"])
+    box("LabBody", (3.4, 1.7, 2.4), (0, 0, 0), teal, bevel=0.14)
+    box("LabRoof", (3.12, 0.22, 2.1), (0, 0.96, 0), dark, bevel=0.06)
+    window_row(2.75, 0.62, -0.32, 4, 1.23, glass, "LabWindow")
+    box("LabDoor", (0.62, 0.9, 0.1), (1.02, -0.42, 1.24), dark, bevel=0.03)
+    cylinder("DomeBase", 0.73, 0.12, (-0.55, 1.13, 0), cream, vertices=12)
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.62, location=web_location((-0.55, 1.39, 0)))
+    dome = bpy.context.object
+    dome.name = "LabDome"
+    dome.scale.z = 0.58
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    finish_object(dome, glass)
+    cylinder("FlaskNeck", 0.08, 0.34, (0.62, 0.48, 1.31), cream, vertices=10)
+    bpy.ops.mesh.primitive_cone_add(vertices=12, radius1=0.22, radius2=0.08, depth=0.4, location=web_location((0.62, 0.22, 1.31)))
+    finish_object(bpy.context.object, mint)
+    export_asset("innovation-lab.glb")
+
+
+def build_contact():
+    reset_scene()
+    cream = material("Contact cream", PALETTE["cream"])
+    coral = material("Contact coral", PALETTE["coral"])
+    dark = material("Contact dark", PALETTE["ink"])
+    metal = material("Dish metal", PALETTE["lavender"], roughness=0.55, metallic=0.22)
+    box("ContactBody", (2.8, 2.2, 2.4), (0, 0, 0), cream, bevel=0.14)
+    box("ContactRoof", (2.52, 0.23, 2.06), (0, 1.22, 0), dark, bevel=0.06)
+    box("ContactDoor", (0.7, 1.05, 0.12), (-0.48, -0.58, 1.24), dark, bevel=0.035)
+    box("ContactWindow", (0.94, 0.62, 0.1), (0.58, -0.2, 1.24), dark, bevel=0.035)
+    box("ContactAwning", (1.55, 0.18, 0.78), (0.08, 0.18, 1.5), coral, bevel=0.05, rotation=(math.radians(-10), 0, 0))
+    cylinder("DishStand", 0.06, 0.5, (0.62, 1.56, 0), dark, vertices=10)
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=20, ring_count=10, radius=0.5, location=web_location((0.62, 1.77, 0.05)))
+    dish = bpy.context.object
+    dish.name = "SatelliteDish"
+    dish.scale = (1.0, 0.24, 0.72)
+    dish.rotation_euler = (math.radians(20), 0, math.radians(-24))
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    finish_object(dish, metal)
+    box("MailboxPost", (0.11, 0.74, 0.11), (1.3, -0.74, 1.28), dark, bevel=0.025)
+    box("Mailbox", (0.48, 0.46, 0.34), (1.3, -0.28, 1.28), coral, bevel=0.08)
+    export_asset("contact-station.glb")
+
+
+def build_car():
+    reset_scene()
+    coral = material("Taxi coral", PALETTE["coral"])
+    coral_light = material("Taxi highlight", PALETTE["coral_light"])
+    dark = material("Taxi dark", PALETTE["ink_dark"])
+    glass = material("Taxi glass", PALETTE["glass"], roughness=0.32, metallic=0.08)
+    cream = material("Taxi lights", PALETTE["cream"], emission=PALETTE["cream"])
+    mustard = material("Taxi marker", PALETTE["mustard"])
+    box("TaxiBody", (1.38, 0.42, 0.76), (0, 0, 0), coral, bevel=0.1)
+    box("TaxiCab", (0.78, 0.38, 0.64), (-0.08, 0.37, 0), coral_light, bevel=0.09)
+    box("TaxiWindshield", (0.3, 0.2, 0.62), (0.34, 0.42, 0), glass, bevel=0.035, rotation=(0, math.radians(-12), 0))
+    box("TaxiRearWindow", (0.28, 0.2, 0.62), (-0.49, 0.4, 0), glass, bevel=0.035, rotation=(0, math.radians(12), 0))
+    box("TaxiRoofSign", (0.34, 0.16, 0.24), (-0.04, 0.67, 0), mustard, bevel=0.04)
+    for side in (-1, 1):
+        for x in (-0.45, 0.48):
+            cylinder(
+                f"Wheel_{side}_{x}",
+                0.18,
+                0.13,
+                (x, -0.18, side * 0.41),
+                dark,
+                vertices=16,
+                rotation=(math.pi / 2, 0, 0),
+                bevel=0.02,
+            )
+    for side in (-0.23, 0.23):
+        box(f"Headlight_{side}", (0.04, 0.15, 0.14), (0.72, 0.02, side), cream, bevel=0.02)
+    export_asset("navigation-car.glb")
+
+
+def build_guide():
+    reset_scene()
+    mustard = material("Guide jacket", PALETTE["mustard"])
+    coral = material("Guide badge", PALETTE["coral"])
+    skin = material("Guide skin", PALETTE["skin"])
+    dark = material("Guide navy", PALETTE["ink"])
+    visor = material("Guide visor", PALETTE["ink_dark"], roughness=0.42, metallic=0.08)
+
+    root = empty("GuideAsset")
+    body_pivot = empty("BodyPivot")
+    head_pivot = empty("HeadPivot", (0, 1.52, 0))
+    left_arm_pivot = empty("LeftArmPivot", (-0.29, 1.17, 0))
+    right_arm_pivot = empty("RightArmPivot", (0.29, 1.17, 0))
+    left_leg_pivot = empty("LeftLegPivot", (-0.12, 0.58, 0))
+    right_leg_pivot = empty("RightLegPivot", (0.12, 0.58, 0))
+    for pivot in (body_pivot, head_pivot, left_arm_pivot, right_arm_pivot, left_leg_pivot, right_leg_pivot):
+        parent_keep_world(pivot, root)
+
+    body = cylinder("GuideBody", 0.24, 0.74, (0, 0.98, 0), mustard, vertices=12, bevel=0.05)
+    badge = box("GuideBadge", (0.3, 0.27, 0.09), (0, 1.08, 0.2), coral, bevel=0.035)
+    head = sphere("GuideHead", 0.27, (0, 1.52, 0), skin, subdivisions=2)
+    glasses = box("GuideVisor", (0.29, 0.09, 0.1), (0, 1.54, 0.23), visor, bevel=0.035)
+    for obj in (body, badge):
+        parent_keep_world(obj, body_pivot)
+    for obj in (head, glasses):
+        parent_keep_world(obj, head_pivot)
+
+    left_arm = cylinder("GuideLeftArm", 0.08, 0.5, (-0.29, 0.93, 0), mustard, vertices=10, bevel=0.025)
+    right_arm = cylinder("GuideRightArm", 0.08, 0.5, (0.29, 0.93, 0), mustard, vertices=10, bevel=0.025)
+    left_leg = cylinder("GuideLeftLeg", 0.095, 0.52, (-0.12, 0.33, 0), dark, vertices=10, bevel=0.025)
+    right_leg = cylinder("GuideRightLeg", 0.095, 0.52, (0.12, 0.33, 0), dark, vertices=10, bevel=0.025)
+    parent_keep_world(left_arm, left_arm_pivot)
+    parent_keep_world(right_arm, right_arm_pivot)
+    parent_keep_world(left_leg, left_leg_pivot)
+    parent_keep_world(right_leg, right_leg_pivot)
+    export_asset("guide-character.glb")
+
+
+def main():
+    builders = (
+        build_plaza,
+        build_studio,
+        build_projects,
+        build_garage,
+        build_lab,
+        build_contact,
+        build_guide,
+    )
+    for builder in builders:
+        builder()
+    reset_scene()
+    print(f"Generated {len(builders)} assets in {OUTPUT}")
+
+
+if __name__ == "__main__":
+    main()

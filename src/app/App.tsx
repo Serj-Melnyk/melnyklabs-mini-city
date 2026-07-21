@@ -1,5 +1,4 @@
-import { useLayoutEffect, useMemo, useState } from 'react'
-import { CityCanvas } from '../scene/CityCanvas'
+import { lazy, Suspense, useLayoutEffect, useMemo, useState } from 'react'
 import { HelpHint } from '../ui/HelpHint'
 import { InfoPanel } from '../ui/InfoPanel'
 import { LoadingScreen } from '../ui/LoadingScreen'
@@ -12,9 +11,19 @@ import { useCityStore } from '../store/useCityStore'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { useCityNavigation } from '../hooks/useCityNavigation'
 import { useCityDeepLinks } from '../hooks/useCityDeepLinks'
+import { useDeviceQuality } from '../hooks/useDeviceQuality'
+
+const CityCanvas = lazy(async () => {
+  const module = await import('../scene/CityCanvas')
+  return { default: module.CityCanvas }
+})
 
 function canUseWebGL() {
   try {
+    if (new URLSearchParams(window.location.search).get('mode') === 'html') {
+      return false
+    }
+
     const canvas = document.createElement('canvas')
     return Boolean(
       window.WebGL2RenderingContext && canvas.getContext('webgl2'),
@@ -31,6 +40,7 @@ export function App() {
   const setCarEnabled = useCityStore((state) => state.setCarEnabled)
   const scrollProgress = useCityStore((state) => state.scrollProgress)
   const reducedMotion = useReducedMotion()
+  const qualityMode = useDeviceQuality()
   useCityNavigation()
   useCityDeepLinks()
 
@@ -39,7 +49,7 @@ export function App() {
   }, [setCarEnabled, webGLAvailable])
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" data-quality={qualityMode}>
       <div className="experience-shell">
         <a className="skip-link" href="#city-content">
           Skip the 3D scene
@@ -48,10 +58,13 @@ export function App() {
 
         <section className="scene-shell" aria-label="Interactive city overview">
           {webGLAvailable ? (
-            <CityCanvas
-              onReady={() => setSceneReady(true)}
-              reducedMotion={reducedMotion}
-            />
+            <Suspense fallback={null}>
+              <CityCanvas
+                onReady={() => setSceneReady(true)}
+                qualityMode={qualityMode}
+                reducedMotion={reducedMotion}
+              />
+            </Suspense>
           ) : (
             <WebGLFallback />
           )}
@@ -74,7 +87,7 @@ export function App() {
         <CarStatus />
         <GuideStatus />
         <InfoPanel />
-        <HelpHint />
+        <HelpHint interactive3d={webGLAvailable} />
         {webGLAvailable && <LoadingScreen visible={!sceneReady} />}
       </div>
     </main>

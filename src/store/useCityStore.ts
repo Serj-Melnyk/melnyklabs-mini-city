@@ -6,6 +6,7 @@ type CityState = {
   hoveredLocation: LocationId | null
   isPanelOpen: boolean
   scrollProgress: number
+  viewDistance: number
   navigationSequence: number
   navigationRequest: { id: LocationId; token: number } | null
   carStatus: 'idle' | 'driving' | 'arrived'
@@ -17,6 +18,7 @@ type CityState = {
   syncActiveLocation: (id: LocationId) => void
   setHoveredLocation: (id: LocationId | null) => void
   setScrollProgress: (progress: number) => void
+  adjustViewDistance: (wheelDelta: number) => void
   completeNavigation: (token: number) => void
   completeCarTrip: (id: LocationId) => void
   setCarEnabled: (enabled: boolean) => void
@@ -32,6 +34,7 @@ export const useCityStore = create<CityState>((set) => ({
   hoveredLocation: null,
   isPanelOpen: false,
   scrollProgress: 0,
+  viewDistance: 1,
   navigationSequence: 0,
   navigationRequest: null,
   carStatus: 'idle',
@@ -55,6 +58,13 @@ export const useCityStore = create<CityState>((set) => ({
   syncActiveLocation: (activeLocation) => set({ activeLocation }),
   setHoveredLocation: (hoveredLocation) => set({ hoveredLocation }),
   setScrollProgress: (scrollProgress) => set({ scrollProgress }),
+  adjustViewDistance: (wheelDelta) =>
+    set((state) => ({
+      viewDistance: Math.min(
+        Math.max(state.viewDistance + wheelDelta * 0.00075, 0.72),
+        1.45,
+      ),
+    })),
   completeNavigation: (token) =>
     set((state) =>
       state.navigationRequest?.token === token

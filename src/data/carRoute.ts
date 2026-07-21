@@ -14,11 +14,12 @@ export type CarTrip = {
 }
 
 export const carRouteConfig = {
-  radius: 4.45,
+  radius: 4.7,
+  roadOuterRadius: 5.25,
   height: 0.38,
   speed: 4.6,
   minimumDuration: 0.65,
-  maximumDuration: 3.2,
+  maximumDuration: 6.5,
 }
 
 const fullTurn = Math.PI * 2
@@ -53,8 +54,9 @@ export function createCarTrip(fromProgress: number, toId: LocationId): CarTrip {
   const targetProgress = getCarStopProgress(toId)
   let deltaProgress = targetProgress - startProgress
 
-  if (deltaProgress > 0.5) deltaProgress -= 1
-  if (deltaProgress < -0.5) deltaProgress += 1
+  // The car follows the one-way ring road. A destination behind the current
+  // stop is reached by continuing forward through the rest of the city.
+  if (deltaProgress < 0) deltaProgress += 1
 
   const distance = Math.abs(deltaProgress) * fullTurn * carRouteConfig.radius
   const rawDuration = distance / carRouteConfig.speed
@@ -76,6 +78,10 @@ export function sampleCarTrip(trip: CarTrip, amount: number) {
   return wrapProgress(
     trip.startProgress + trip.deltaProgress * easedAmount,
   )
+}
+
+export function getCarTripDuration(trip: CarTrip, lightweight: boolean) {
+  return lightweight ? trip.duration * 0.55 : trip.duration
 }
 
 export function getNextCarLocation(id: LocationId) {

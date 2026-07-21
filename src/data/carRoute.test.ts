@@ -4,6 +4,7 @@ import {
   carRouteConfig,
   createCarTrip,
   getCarStopProgress,
+  getCarTripDuration,
   getNextCarLocation,
   sampleCarRoute,
   sampleCarTrip,
@@ -31,12 +32,24 @@ describe('navigation car route', () => {
     }
   })
 
-  it('chooses the shortest direction around the closed route', () => {
+  it('always drives forward around the closed route', () => {
     const trip = createCarTrip(0.98, 'services')
-    expect(Math.abs(trip.deltaProgress)).toBeLessThanOrEqual(0.5)
+    expect(trip.deltaProgress).toBeGreaterThan(0)
+    expect(trip.deltaProgress).toBeLessThan(1)
     expect(trip.duration).toBeGreaterThan(0)
     expect(sampleCarTrip(trip, 0)).toBeCloseTo(0.98)
     expect(sampleCarTrip(trip, 1)).toBeCloseTo(getCarStopProgress('services'))
+  })
+
+  it('continues through the city instead of reversing to a previous stop', () => {
+    const aboutProgress = getCarStopProgress('about')
+    const projectsProgress = getCarStopProgress('projects')
+    const trip = createCarTrip(aboutProgress, 'projects')
+
+    expect(projectsProgress).toBeLessThan(aboutProgress)
+    expect(trip.deltaProgress).toBeCloseTo(1 - aboutProgress + projectsProgress)
+    expect(trip.distance).toBeGreaterThan(Math.PI * carRouteConfig.radius)
+    expect(sampleCarTrip(trip, 0.5)).toBeGreaterThan(aboutProgress)
   })
 
   it('creates a zero-duration trip when already at a stop', () => {
@@ -44,5 +57,12 @@ describe('navigation car route', () => {
     const trip = createCarTrip(progress, 'projects')
     expect(trip.distance).toBeCloseTo(0)
     expect(trip.duration).toBe(0)
+  })
+
+  it('shortens trips in lightweight mode', () => {
+    const trip = createCarTrip(getCarStopProgress('plaza'), 'contact')
+
+    expect(getCarTripDuration(trip, true)).toBeLessThan(trip.duration)
+    expect(getCarTripDuration(trip, false)).toBe(trip.duration)
   })
 })
