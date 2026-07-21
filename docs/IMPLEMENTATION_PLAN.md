@@ -568,17 +568,40 @@ The stable visual comparison therefore uses the verified 1280×720 browser
 capture plus separate 390×844 responsive QA; this is the recorded native-size
 capture blocker, not an untested layout.
 
-### Detailed reference fidelity backlog
+### Detailed reference pass
 
-The owner supplied `docs/design/melnyklabs-mini-city-reference.png` as the
-detailed production target. The first comparison is recorded in
-`design-qa.md`. The existing interaction architecture remains valid, but the
-next visual pass must close these reference gaps:
+Completed on 2026-07-21:
 
-- expand the city to the reference's denser seven-building composition;
-- represent the three project cards as three distinct project façades;
-- add crisp, non-essential façade labels while retaining all critical copy in
-  accessible HTML;
-- rebuild the connected curb, pavement, crosswalk, planter, and prop rhythm;
-- tune the overview camera, light balance, ambient occlusion, and material
-  contrast against the supplied 1568×1003 reference.
+- expanded the overview from five to seven buildings while preserving five
+  primary navigation destinations;
+- generated `project-district-one.glb` and
+  `project-district-two.glb` as original project-owned Blender assets;
+- baked readable façade names into the GLBs as mesh geometry while retaining
+  all essential copy in semantic HTML;
+- repositioned the seven foundations outside the ring road and kept the five
+  primary car stops on matching radial approaches;
+- added green verge beds, radial road approaches, two crosswalks, a lower
+  platform layer, instanced lamps, benches, and non-blocking tree clusters;
+- promoted Developer Studio as the back-center landmark, separated Contact
+  Station from Service Garage, and tuned all overview-facing angles;
+- added a restrained teal Studio frame, warmer key light, darker fill, radial
+  indigo background, and a smaller guide character;
+- compared the implementation and supplied reference at 1568×1003 in one
+  side-by-side image and recorded the final audit in `design-qa.md`.
+
+Final reference-pass validation:
+
+- `npm run lint` — passed;
+- `npm run typecheck` — passed;
+- `npm test -- --run` — 34/34 tests passed across nine suites;
+- `npm run build` — passed;
+- `VITE_BASE_PATH=/melnyklabs-mini-city/ npm run build` — passed;
+- ten original GLBs total 696,940 bytes, below the 4 MB budget;
+- Browser/IAB desktop overview and mobile menu-to-Contact journey passed with
+  no application error; the only console warning is the upstream Three.js
+  `Clock` deprecation.
+
+The above-the-fold copy diff remains limited to the intentional,
+user-requested `Shift + scroll to zoom` hint. The remaining visual difference
+from the rendered concept is polish-level mesh granularity rather than missing
+composition, identity, or interaction structure.

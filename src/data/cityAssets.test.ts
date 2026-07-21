@@ -5,6 +5,7 @@ import {
   carAssetPath,
   cityAssetPaths,
   guideAssetPath,
+  projectAnnexAssetPaths,
   productionAssetPaths,
 } from './cityAssets'
 import { locations } from './locations'
@@ -23,6 +24,13 @@ describe('production city assets', () => {
     expect(carAssetPath).toContain('melnyklabs-sports-car.glb')
     expect(statSync(resolve(process.cwd(), 'public', carAssetPath.slice(1))).size)
       .toBeLessThan(100 * 1024)
+  })
+
+  it('includes two original project annex models for the seven-building composition', () => {
+    expect(projectAnnexAssetPaths).toHaveLength(2)
+    expect(new Set(projectAnnexAssetPaths).size).toBe(2)
+    expect(projectAnnexAssetPaths.every((path) => path.endsWith('.glb'))).toBe(true)
+    expect(productionAssetPaths).toHaveLength(10)
   })
 
   it('keeps every model present and the combined GLB payload under 4 MB', () => {

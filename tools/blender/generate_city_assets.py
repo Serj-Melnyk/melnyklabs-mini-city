@@ -199,6 +199,22 @@ def planter(x, y, z, pot, leaves, name):
         sphere(f"{name}_Leaf_{index}", 0.16, (x + offset, y + 0.25, z), leaves)
 
 
+def facade_text(name, value, location, mat, size=0.2, extrude=0.008):
+    """Create centered, lightweight mesh lettering facing the web +z facade."""
+    bpy.ops.object.text_add(location=web_location(location), rotation=(math.pi / 2, 0, 0))
+    obj = bpy.context.object
+    obj.name = name
+    obj.data.body = value
+    obj.data.align_x = "CENTER"
+    obj.data.align_y = "CENTER"
+    obj.data.size = size
+    obj.data.extrude = extrude
+    obj.data.bevel_depth = 0.003
+    obj.data.space_line = 0.86
+    bpy.ops.object.convert(target="MESH")
+    return finish_object(obj, mat)
+
+
 def export_asset(filename):
     for obj in bpy.context.scene.objects:
         if obj.type == "MESH":
@@ -254,16 +270,21 @@ def build_studio():
     glass = material("Studio glass", PALETTE["glass"], roughness=0.36, metallic=0.08, emission=PALETTE["glass_light"])
     green = material("Planter leaves", PALETTE["green"])
     wood = material("Planter", PALETTE["wood"])
-    box("StudioBody", (3.2, 3.0, 2.4), (0, 0, 0), navy, bevel=0.14)
-    box("StudioTealFrame", (3.34, 0.2, 2.54), (0, 1.38, 0), teal, bevel=0.06)
-    box("StudioRoof", (2.76, 0.28, 1.96), (0, 1.64, 0), trim, bevel=0.08)
-    box("StudioDoor", (0.68, 1.0, 0.12), (0, -0.98, 1.23), glass, bevel=0.03)
-    window_row(2.5, 0.62, 0.5, 3, 1.23, glass, "StudioUpperWindow")
+    box("StudioBody", (3.2, 3.6, 2.4), (0, 0, 0), navy, bevel=0.14)
+    box("StudioFrameLeft", (0.12, 3.5, 0.12), (-1.61, 0, 1.25), teal, bevel=0.035)
+    box("StudioFrameRight", (0.12, 3.5, 0.12), (1.61, 0, 1.25), teal, bevel=0.035)
+    box("StudioFrameTop", (3.28, 0.12, 0.12), (0, 1.74, 1.25), teal, bevel=0.035)
+    box("StudioFrameBottom", (3.28, 0.12, 0.12), (0, -1.74, 1.25), teal, bevel=0.035)
+    box("StudioTealFrame", (3.34, 0.2, 2.54), (0, 1.68, 0), teal, bevel=0.06)
+    box("StudioRoof", (2.76, 0.28, 1.96), (0, 1.94, 0), trim, bevel=0.08)
+    box("StudioDoor", (0.68, 1.0, 0.12), (0, -1.28, 1.23), glass, bevel=0.03)
+    window_row(2.5, 0.62, 0.8, 3, 1.23, glass, "StudioUpperWindow")
     window_row(2.5, 0.54, -0.45, 3, 1.23, glass, "StudioLowerWindow")
-    box("CodeSign", (0.86, 0.62, 0.1), (0, 0.58, 1.31), teal, bevel=0.08)
-    box("CodeSlash", (0.08, 0.38, 0.06), (0, 0.58, 1.38), trim, bevel=0.02, rotation=(0, math.radians(18), 0))
-    planter(-1.05, -1.32, 1.24, wood, green, "StudioPlanterLeft")
-    planter(1.05, -1.32, 1.24, wood, green, "StudioPlanterRight")
+    box("CodeSign", (0.86, 0.62, 0.1), (0, 0.72, 1.31), teal, bevel=0.08)
+    box("CodeSlash", (0.08, 0.38, 0.06), (0, 0.72, 1.38), trim, bevel=0.02, rotation=(0, math.radians(18), 0))
+    facade_text("StudioLabel", "DEVELOPER\nSTUDIO", (0, 0.08, 1.37), trim, size=0.18)
+    planter(-1.05, -1.62, 1.24, wood, green, "StudioPlanterLeft")
+    planter(1.05, -1.62, 1.24, wood, green, "StudioPlanterRight")
     export_asset("developer-studio.glb")
 
 
@@ -280,6 +301,7 @@ def build_projects():
     box("ProjectCornice", (3.02, 0.28, 2.58), (0, 1.05, 0), deep, bevel=0.06)
     box("ProjectRoof", (2.48, 0.24, 2.0), (0, 1.33, 0), cream, bevel=0.07)
     box("ProjectSign", (2.0, 0.58, 0.11), (0, 0.5, 1.25), deep, bevel=0.06)
+    facade_text("ProjectLabel", "PROJECT\nDISTRICT 3", (0, 0.5, 1.32), cream, size=0.17)
     box("ProjectDoor", (0.62, 0.9, 0.1), (0.46, -0.7, 1.24), glass, bevel=0.03)
     box("ProjectWindow", (1.05, 0.66, 0.1), (-0.55, -0.62, 1.24), glass, bevel=0.03)
     for index, x in enumerate((-0.92, -0.46, 0.0, 0.46, 0.92)):
@@ -288,6 +310,85 @@ def build_projects():
     planter(-0.92, -0.98, 1.27, wood, green, "ProjectPlanterLeft")
     planter(0.92, -0.98, 1.27, wood, green, "ProjectPlanterRight")
     export_asset("project-district.glb")
+
+
+def build_project_one():
+    reset_scene()
+    coral = material("District one coral", PALETTE["coral"])
+    coral_light = material("District one highlight", PALETTE["coral_light"])
+    cream = material("District one cream", PALETTE["cream"])
+    dark = material("District one sign", PALETTE["wood"])
+    glass = material("District one glass", PALETTE["glass"], roughness=0.38)
+    green = material("District one plants", PALETTE["green"])
+    wood = material("District one planters", PALETTE["wood"])
+
+    box("DistrictOneBody", (3.0, 2.8, 2.4), (0, 0, 0), coral, bevel=0.14)
+    box("DistrictOneInset", (2.58, 2.34, 0.14), (0, 0.02, 1.23), coral_light, bevel=0.08)
+    box("DistrictOneCornice", (3.18, 0.26, 2.58), (0, 1.3, 0), dark, bevel=0.06)
+    box("DistrictOneRoof", (2.72, 0.22, 2.06), (0, 1.55, 0), cream, bevel=0.07)
+    box("DistrictOneRoofCap", (0.62, 0.28, 0.5), (-0.7, 1.75, -0.35), dark, bevel=0.06)
+    box("DistrictOneSign", (1.84, 0.62, 0.11), (0.37, 0.62, 1.34), dark, bevel=0.05)
+    facade_text("DistrictOneLabel", "PROJECT\nDISTRICT 1", (0.37, 0.62, 1.41), cream, size=0.17)
+    box("DistrictOneDoor", (0.64, 0.98, 0.11), (0.48, -0.86, 1.35), glass, bevel=0.03)
+    box("DistrictOneWindow", (1.12, 0.7, 0.11), (-0.52, -0.72, 1.35), glass, bevel=0.03)
+    for index, x in enumerate((-0.86, -0.43, 0.0, 0.43, 0.86)):
+        awning_mat = cream if index % 2 == 0 else coral_light
+        box(
+            f"DistrictOneAwning_{index}",
+            (0.43, 0.18, 0.68),
+            (x, -0.18, 1.55),
+            awning_mat,
+            bevel=0.03,
+            rotation=(math.radians(-10), 0, 0),
+        )
+    box("DistrictOneIconBack", (0.42, 0.52, 0.1), (-0.9, 0.66, 1.35), cream, bevel=0.04)
+    box("DistrictOneIcon", (0.22, 0.3, 0.08), (-0.9, 0.66, 1.42), coral_light, bevel=0.035)
+    planter(-1.0, -1.12, 1.36, wood, green, "DistrictOnePlanterLeft")
+    planter(1.0, -1.12, 1.36, wood, green, "DistrictOnePlanterRight")
+    export_asset("project-district-one.glb")
+
+
+def build_project_two():
+    reset_scene()
+    teal = material("District two teal", PALETTE["mint_dark"])
+    mint = material("District two mint", PALETTE["mint"])
+    cream = material("District two cream", PALETTE["cream"])
+    dark = material("District two sign", PALETTE["ink"])
+    glass = material("District two glass", PALETTE["glass"], roughness=0.34)
+    green = material("District two plants", PALETTE["green"])
+    wood = material("District two planters", PALETTE["wood"])
+
+    box("DistrictTwoBody", (2.8, 2.0, 2.4), (0, 0, 0), teal, bevel=0.14)
+    box("DistrictTwoCornice", (2.98, 0.25, 2.58), (0, 0.9, 0), dark, bevel=0.06)
+    box("DistrictTwoRoof", (2.52, 0.22, 2.04), (0, 1.15, 0), cream, bevel=0.07)
+    box("DistrictTwoRoofCap", (0.62, 0.24, 0.5), (-0.6, 1.34, -0.3), dark, bevel=0.055)
+    box("DistrictTwoSign", (1.82, 0.54, 0.11), (0.28, 0.42, 1.3), dark, bevel=0.05)
+    facade_text("DistrictTwoLabel", "PROJECT\nDISTRICT 2", (0.28, 0.42, 1.37), cream, size=0.16)
+    box("DistrictTwoDoor", (0.62, 0.9, 0.11), (0.48, -0.56, 1.29), glass, bevel=0.03)
+    box("DistrictTwoWindow", (1.0, 0.64, 0.11), (-0.48, -0.49, 1.29), glass, bevel=0.03)
+    for index, x in enumerate((-0.84, -0.42, 0.0, 0.42, 0.84)):
+        awning_mat = cream if index % 2 == 0 else mint
+        box(
+            f"DistrictTwoAwning_{index}",
+            (0.42, 0.17, 0.62),
+            (x, -0.05, 1.48),
+            awning_mat,
+            bevel=0.03,
+            rotation=(math.radians(-10), 0, 0),
+        )
+    box("DistrictTwoIconBack", (0.46, 0.5, 0.1), (-0.88, 0.43, 1.3), cream, bevel=0.04)
+    for index, x in enumerate((-0.98, -0.88, -0.78)):
+        box(
+            f"DistrictTwoMountain_{index}",
+            (0.08, 0.28 - abs(index - 1) * 0.07, 0.07),
+            (x, 0.42, 1.37),
+            mint,
+            bevel=0.018,
+            rotation=(0, math.radians((index - 1) * 25), 0),
+        )
+    planter(-0.92, -0.86, 1.31, wood, green, "DistrictTwoPlanterLeft")
+    planter(0.92, -0.86, 1.31, wood, green, "DistrictTwoPlanterRight")
+    export_asset("project-district-two.glb")
 
 
 def build_garage():
@@ -302,6 +403,7 @@ def build_garage():
     for index in range(5):
         box(f"GarageDoorSlat_{index}", (1.55, 0.035, 0.025), (-0.32, -0.8 + index * 0.24, 1.32), cream)
     box("GarageSign", (2.06, 0.42, 0.1), (0, 0.62, 1.25), cream, bevel=0.05)
+    facade_text("GarageLabel", "SERVICE\nGARAGE", (-0.18, 0.62, 1.32), dark, size=0.17)
     box("WrenchStem", (0.12, 0.46, 0.08), (0.72, 0.64, 1.33), dark, bevel=0.025, rotation=(0, math.radians(-28), 0))
     cylinder("WrenchHead", 0.16, 0.08, (0.83, 0.84, 1.34), dark, vertices=8, rotation=(math.pi / 2, 0, 0))
     for index, x in enumerate((0.75, 1.05, 1.33)):
@@ -320,6 +422,7 @@ def build_lab():
     box("LabRoof", (3.12, 0.22, 2.1), (0, 0.96, 0), dark, bevel=0.06)
     window_row(2.75, 0.62, -0.32, 4, 1.23, glass, "LabWindow")
     box("LabDoor", (0.62, 0.9, 0.1), (1.02, -0.42, 1.24), dark, bevel=0.03)
+    facade_text("LabLabel", "INNOVATION\nLAB", (-0.62, 0.38, 1.31), cream, size=0.18)
     cylinder("DomeBase", 0.73, 0.12, (-0.55, 1.13, 0), cream, vertices=12)
     bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.62, location=web_location((-0.55, 1.39, 0)))
     dome = bpy.context.object
@@ -343,6 +446,7 @@ def build_contact():
     box("ContactRoof", (2.52, 0.23, 2.06), (0, 1.22, 0), dark, bevel=0.06)
     box("ContactDoor", (0.7, 1.05, 0.12), (-0.48, -0.58, 1.24), dark, bevel=0.035)
     box("ContactWindow", (0.94, 0.62, 0.1), (0.58, -0.2, 1.24), dark, bevel=0.035)
+    facade_text("ContactLabel", "CONTACT\nSTATION", (0.58, 0.42, 1.31), dark, size=0.17)
     box("ContactAwning", (1.55, 0.18, 0.78), (0.08, 0.18, 1.5), coral, bevel=0.05, rotation=(math.radians(-10), 0, 0))
     cylinder("DishStand", 0.06, 0.5, (0.62, 1.56, 0), dark, vertices=10)
     bpy.ops.mesh.primitive_uv_sphere_add(segments=20, ring_count=10, radius=0.5, location=web_location((0.62, 1.77, 0.05)))
@@ -469,6 +573,8 @@ def main():
         build_plaza,
         build_studio,
         build_projects,
+        build_project_one,
+        build_project_two,
         build_garage,
         build_lab,
         build_contact,

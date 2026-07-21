@@ -13,10 +13,15 @@ export const cityAssetPaths: Record<LocationId, string> = {
 
 export const guideAssetPath = fromPublic('assets/models/guide-character.glb')
 export const carAssetPath = fromPublic('assets/models/melnyklabs-sports-car.glb')
+export const projectAnnexAssetPaths = [
+  fromPublic('assets/models/project-district-one.glb'),
+  fromPublic('assets/models/project-district-two.glb'),
+] as const
 export const dracoDecoderPath = fromPublic('draco/')
 
 export const productionAssetPaths = [
   ...Object.values(cityAssetPaths),
+  ...projectAnnexAssetPaths,
   guideAssetPath,
   carAssetPath,
 ]

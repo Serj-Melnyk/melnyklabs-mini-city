@@ -2,138 +2,92 @@
 
 Source visual truth: `docs/design/melnyklabs-mini-city-reference.png`
 
-Implementation evidence:
-`/Users/serhii/.codex/visualizations/2026/07/20/019f8152-211e-7680-aa18-45a660cc8a42/melnyklabs-milestone-7-browser.png`
+Final desktop evidence:
+`/Users/serhii/.codex/visualizations/2026/07/20/019f8152-211e-7680-aa18-45a660cc8a42/melnyklabs-seven-building-neutral.png`
 
-Car-heading evidence:
-`/Users/serhii/.codex/visualizations/2026/07/20/019f8152-211e-7680-aa18-45a660cc8a42/melnyklabs-car-heading-fixed.png`
+Final same-size comparison:
+`/Users/serhii/.codex/visualizations/2026/07/20/019f8152-211e-7680-aa18-45a660cc8a42/reference-vs-seven-building-final.png`
 
-Comparison composite:
-`/Users/serhii/.codex/visualizations/2026/07/20/019f8152-211e-7680-aa18-45a660cc8a42/reference-vs-current-city.png`
+Focused lighting and Studio-frame evidence:
+`/Users/serhii/.codex/visualizations/2026/07/20/019f8152-211e-7680-aa18-45a660cc8a42/melnyklabs-reference-pass-final.jpg`
 
-Viewport: source 1568×1003; implementation 1280×720. Browser/IAB continued
-to report a 1280×720 CSS viewport after requesting the source dimensions, and
-its Retina screenshot surface cropped the overview at the attempted override.
-The stable 1280×720 first viewport is therefore used for the initial backlog.
+State: Central Plaza overview with `quality=full`.
 
-State: Central Plaza overview. The car-heading fix is additionally checked at
-the Developer Studio stop, where the road tangent points toward local `-X`.
+Viewport: source and stable implementation captures are both 1568×1003. The
+in-app browser accepted a 390×844 mobile emulation for CSS and DOM checks, but
+its screenshot surface returned a compressed 390×249 frame. Mobile layout was
+therefore verified through semantic DOM, menu interaction, Contact navigation,
+and absence of application errors; the native-height screenshot mismatch is a
+capture-surface limitation.
 
-## Full-view comparison evidence
+## Full-view comparison
 
-The source and implementation were normalized to equal 1280×720 panels and
-joined into one side-by-side image before review. The source uses a dense,
-nearly edge-to-edge seven-building city with connected sidewalks and a bright
-central plaza. The current implementation preserves the correct product story
-and interaction frame but has five buildings, larger empty zones, fewer façade
-details, and a flatter lighting/material balance.
+The source and implementation were joined at their native 1568×1003 size and
+inspected together. The implementation now follows the same seven-building
+tabletop composition: three project districts, Developer Studio as the back
+center landmark, Innovation Lab at lower left, Service Garage at right,
+Contact Station at lower right, and a circular public plaza in the middle.
 
-## Focused comparison evidence
+## Comparison points
 
-The Developer Studio car-heading capture was inspected separately because the
-vehicle is too small to judge precisely in the full overview. Its spoiler sits
-at the rear/right and its headlights and nose face left, matching the `-X`
-road tangent at the About stop. No additional focused crop is required for the
-remaining backlog because the missing building inventory, signs, curb network,
-and lighting difference are unambiguous in the full-view composite.
+| Surface | Result |
+| --- | --- |
+| Building inventory and hierarchy | Seven visible buildings now match the reference story and relative district hierarchy. |
+| Façade identity | Every building has authored mesh lettering; code, project, lab, contact, and garage geometry remain readable without carrying essential content. |
+| Roads and public space | Ring road, radial approaches, rotated foundations, green verge beds, two crosswalks, layered platform, lamps, benches, and trees reproduce the tabletop rhythm. |
+| Lighting and materials | Warm directional light, darker fill, local shadows, matte materials, and a radial indigo background improve the reference's light/dark separation. |
+| Header and hero | Brand, navigation order, exact heading, support copy, and CTA preserve the source hierarchy and placement family. |
+| Vehicle and guide | The original coral sports car follows the road nose-first; the smaller authored guide sits inside the safe plaza. |
+| Interaction | Menu, route rail, building clicks, one-way car travel, panels, contact form, reduced motion, and HTML fallback remain functional. |
 
-## Findings
+## Closed findings
 
-- [P1] City inventory and density do not yet match.
-  Location: overview scene and `src/data/locations.ts`.
-  Evidence: the reference has seven visible buildings, including three
-  project façades; the implementation has five primary buildings and one
-  project façade.
-  Impact: the current city reads as a sparse prototype instead of the complete
-  portfolio district shown in the target.
-  Fix: add two project façades mapped to the three existing project cards and
-  rebalance the city footprint around the ring road.
+- [x] Added the two missing Project District GLBs and integrated a complete
+  seven-building layout.
+- [x] Added crisp façade names as Blender-generated mesh geometry and retained
+  semantic equivalents in HTML.
+- [x] Added connected approaches, rotated foundations, green verge modules,
+  crosswalks, street furniture, and a layered platform base.
+- [x] Tuned overview camera, building-facing angles, warmer light, background
+  depth, hero scale, and landmark hierarchy against the source capture.
+- [x] Removed the legacy car quarter-turn so the sports car travels nose-first.
+- [x] Kept every building beyond the outer curb and every primary car stop on
+  the configured one-way circular route.
 
-- [P1] Façade identity and signage are under-specified.
-  Location: generated GLBs and building presentation.
-  Evidence: the reference has readable district labels and distinct code,
-  mountain, beaker, envelope, and wrench identities; the implementation relies
-  mostly on color and simplified geometry.
-  Impact: visitors cannot identify each building from the overview as quickly
-  as the target implies.
-  Fix: add crisp decorative façade labels and matching authored sign assets,
-  while keeping all essential content duplicated in semantic HTML.
+## Intentional deviations
 
-- [P2] Road, curb, and public-space rhythm is too simple.
-  Location: `src/world/CityGround.tsx` and `src/world/CityDetails.tsx`.
-  Evidence: the reference has connected corner sidewalks, multiple
-  crosswalks, planters, planted verges, lamps, and a layered plaza; the
-  implementation uses a broad ring and fewer connecting surfaces.
-  Impact: the scene lacks the crafted tabletop density of the reference.
-  Fix: author the visible sidewalk network, curb islands, crosswalks, and prop
-  clusters as reusable low-poly modules.
+- The source is a rendered concept image; production uses original,
+  reproducible low-poly GLBs rather than attempting to copy its exact meshes.
+- Essential portfolio content remains semantic HTML instead of being baked
+  exclusively into WebGL.
+- The production UI includes the user-requested `Shift + scroll to zoom` hint,
+  a working contact form, reduced-motion behavior, and WebGL fallback that are
+  not visible in the static reference.
+- The remaining difference is polish-level asset granularity (for example
+  roof HVAC variations and more planted curb islands), not missing layout,
+  identity, navigation, or interaction structure.
 
-- [P2] Overview lighting and material separation are flatter than the target.
-  Location: `src/scene/Lighting.tsx` and generated asset materials.
-  Evidence: the reference has warmer key light, clearer ambient occlusion, and
-  stronger light/dark separation on façades; the implementation is cooler and
-  more uniformly lit.
-  Impact: building silhouettes and depth cues are weaker.
-  Fix: tune warm key/fill balance, restrained AO/contact shadow, and material
-  roughness/contrast without adding glossy realism or heavy effects.
+## Validation
 
-- [P2] First-viewport city scale and framing require another camera pass.
-  Location: overview checkpoint in `src/data/cameraRoute.ts`.
-  Evidence: the reference city occupies most of the center frame while
-  preserving hero and navigation space; the stable implementation capture
-  leaves more negative space and gives the city less visual weight.
-  Impact: the city is not yet the dominant first-view product signal.
-  Fix: tune the overview position/target after the seven-building layout is
-  complete, then recheck 1568×1003, 1280×720, and 390×844.
-
-## Required fidelity surfaces
-
-- Fonts and typography: Inter, cream text, bold two-line hero, navigation
-  hierarchy, and CTA copy match the reference family. The implementation hero
-  is slightly larger relative to the city; reassess after camera/layout work.
-- Spacing and layout rhythm: header, hero, route rail, and bottom hint use the
-  correct regions, but the 3D city is less dense and occupies less of the frame.
-- Colors and visual tokens: indigo, cream, coral, teal, mustard, and lavender
-  are aligned; lighting temperature and façade contrast remain actionable.
-- Image quality and asset fidelity: GLBs are sharp, original, and lightweight,
-  but two buildings, detailed signage, and much of the curb/prop language are
-  missing compared with the source.
-- Copy and content: above-the-fold navigation, headline, supporting copy, and
-  CTA match. The only intentional addition is `Shift + scroll to zoom` in the
-  bottom instruction.
-- Icons: current authored signs are simplified; the reference's five distinct
-  façade symbols and text labels remain to be matched.
-- Interaction/accessibility: navigation, panels, car, reduced motion, and HTML
-  fallback remain functional and should be preserved through the visual pass.
-
-## Comparison history
-
-### Pass 1 — 2026-07-21
-
-Earlier functional issue: the new sports car inherited a `+90°` child rotation
-from the former third-party model and travelled sideways.
-
-Fix made: removed the child quarter-turn in `NavigationCar.tsx`; the generated
-car's local `+X` nose now follows `sampleCarRoute().rotationY` directly. Added a
-route contract test for that heading axis and inspected the revised About-stop
-capture.
-
-Post-fix evidence: the car is nose-first at Developer Studio and the browser
-console has no application error. The broader reference findings above remain
-open for the next production-asset pass.
-
-## Implementation checklist
-
-1. Add the two missing project façades and associated click targets.
-2. Add building labels and authored symbols.
-3. Build connected sidewalks, crosswalks, and planted curb modules.
-4. Tune city composition, camera, and lighting.
-5. Repeat same-state desktop/mobile capture and design QA.
+- `npm run lint` — passed.
+- `npm run typecheck` — passed.
+- `npm test -- --run` — 34/34 passed across nine suites.
+- `npm run build` — passed.
+- `VITE_BASE_PATH=/melnyklabs-mini-city/ npm run build` — passed.
+- Ten project-owned GLBs total 696,940 bytes, below the 4 MB budget.
+- Desktop Browser/IAB — full scene, header, hero, route rail, car, and props
+  verified with no application error.
+- Mobile Browser/IAB — menu opened, exact Contact navigation reached
+  `#contact`, Contact Station content appeared, and no application error was
+  logged.
+- The only console warning is the upstream Three.js `Clock` deprecation in the
+  development dependency path.
 
 ## Follow-up polish
 
-- Refine wheel rotation and subtle suspension only after composition fidelity.
-- Add small roof HVAC and mailbox/planter variations where they support the
-  reference without exceeding the performance budget.
+- Add small roof and curb-island variations only if they do not compromise the
+  current payload and mobile clarity.
+- Replace the development-only upstream `Clock` warning when React Three Fiber
+  updates its dependency path.
 
-final result: blocked
+final result: passed

@@ -25,7 +25,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--focus); outline
 .sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
 
 .app-shell { position: relative; height: 650svh; background: var(--ink-950); }
-.experience-shell { position: sticky; top: 0; min-height: 100svh; overflow: hidden; background: var(--ink-950); }
+.experience-shell { position: sticky; top: 0; min-height: 100svh; overflow: hidden; background: radial-gradient(circle at 50% 44%, #15294a 0%, var(--ink-950) 64%); }
 .scene-shell, .scene-shell canvas { position: absolute !important; inset: 0; width: 100% !important; height: 100% !important; }
 .scene-shell::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(7,20,43,.36) 0%, transparent 30%), linear-gradient(0deg, rgba(7,20,43,.38) 0%, transparent 38%); }
 
@@ -41,7 +41,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--focus); outline
 
 .hero-copy { position: absolute; z-index: 5; left: clamp(24px, 4vw, 64px); bottom: clamp(58px, 8vh, 94px); width: min(600px, 42vw); pointer-events: none; transition: opacity 240ms ease, transform 240ms ease; }
 .hero-copy.is-away { opacity: 0; pointer-events: none; transform: translateY(18px); }
-.hero-copy h1 { margin: 0; max-width: 12ch; font-size: clamp(2.5rem, 4.6vw, 5rem); line-height: .95; letter-spacing: -.065em; }
+.hero-copy h1 { margin: 0; max-width: 12ch; font-size: clamp(2.5rem, 3.45vw, 4rem); line-height: .95; letter-spacing: -.065em; }
 .hero-copy p { max-width: 38ch; margin: 20px 0 24px; color: var(--cream-200); font-size: clamp(.95rem, 1.2vw, 1.13rem); line-height: 1.55; }
 .hero-copy button { display: inline-flex; min-height: 52px; align-items: center; gap: 34px; padding: 0 24px; border: 2px solid var(--cream-100); border-radius: 18px; background: var(--coral-500); box-shadow: 0 10px 26px rgba(242,107,79,.18); font-size: .98rem; font-weight: 700; pointer-events: auto; cursor: pointer; transition: transform 180ms ease, background 180ms ease; }
 .hero-copy button:hover { background: var(--coral-300); transform: translateY(-2px); }
