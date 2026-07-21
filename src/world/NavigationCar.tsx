@@ -146,7 +146,6 @@ export function NavigationCar({ qualityMode, reducedMotion }: NavigationCarProps
     >
       <group
         position={[0, -0.32, 0]}
-        rotation={[0, Math.PI / 2, 0]}
         scale={carModel.scale}
       >
         <primitive object={carModel.model} />

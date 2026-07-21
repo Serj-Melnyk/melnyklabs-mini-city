@@ -18,7 +18,7 @@ export function CityCanvas({ onReady, qualityMode, reducedMotion }: CityCanvasPr
       dpr={lightweight ? 1 : [1, 1.5]}
       frameloop="demand"
       shadows={lightweight ? false : 'basic'}
-      camera={{ position: [12.4, 12.4, 16.4], fov: 36, near: 0.1, far: 100 }}
+      camera={{ position: [8.5, 14.6, 22], fov: 36, near: 0.1, far: 100 }}
       gl={{ antialias: !lightweight, alpha: true, powerPreference: 'high-performance' }}
       style={{ touchAction: 'pan-y' }}
     >

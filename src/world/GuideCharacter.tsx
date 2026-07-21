@@ -194,7 +194,7 @@ export function GuideCharacter({ reducedMotion }: GuideCharacterProps) {
   return (
     <group
       ref={root}
-      scale={hovered ? 1.05 : 1}
+      scale={hovered ? 0.76 : 0.72}
       onClick={showNextDirection}
       onPointerEnter={(event) => {
         event.stopPropagation()

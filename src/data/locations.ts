@@ -34,8 +34,8 @@ export const locations: CityLocation[] = [
     position: [0, 0.35, 0],
     size: [2.3, 2.6, 2.3],
     rotationY: 0,
-    cameraPosition: [12.4, 12.4, 16.4],
-    cameraTarget: [0, -0.25, 0],
+    cameraPosition: [8.5, 14.6, 22],
+    cameraTarget: [0, -1.1, 0],
     carStop: [0, 0.38, 4.7],
   },
   {
@@ -46,12 +46,12 @@ export const locations: CityLocation[] = [
     description: 'Frontend development, React, AI and interactive product work.',
     action: 'About me',
     color: '#6ed8c5',
-    position: [0, 1.5, -7],
-    size: [3.2, 3, 2.4],
-    rotationY: 0,
+    position: [-2.8, 1.8, -7],
+    size: [3.2, 3.6, 2.4],
+    rotationY: 0.37,
     cameraPosition: [7.2, 6.6, 3.4],
-    cameraTarget: [0, 1, -7],
-    carStop: [0, 0.38, -4.7],
+    cameraTarget: [-2.8, 1.35, -7],
+    carStop: [-1.75, 0.38, -4.36],
   },
   {
     id: 'projects',
@@ -61,12 +61,12 @@ export const locations: CityLocation[] = [
     description: 'Selected apps, Telegram games and experiments built to be used.',
     action: 'View projects',
     color: '#e4ad52',
-    position: [6.3, 1.15, -3.3],
+    position: [5.6, 1.15, -4.2],
     size: [2.8, 2.3, 2.4],
-    rotationY: -1.088,
-    cameraPosition: [13.5, 7, 4.5],
-    cameraTarget: [6.3, 1, -3.3],
-    carStop: [4.16, 0.38, -2.18],
+    rotationY: 0.11,
+    cameraPosition: [12.7, 7, 2.6],
+    cameraTarget: [5.6, 1, -4.2],
+    carStop: [3.76, 0.38, -2.82],
   },
   {
     id: 'services',
@@ -76,12 +76,12 @@ export const locations: CityLocation[] = [
     description: 'Landing pages, React interfaces, UI prototypes and AI integrations.',
     action: 'See services',
     color: '#8f91ad',
-    position: [6.2, 1, 4],
+    position: [8, 1, 1.2],
     size: [3, 2, 2.4],
-    rotationY: -2.144,
-    cameraPosition: [13.4, 7.1, 11.8],
-    cameraTarget: [6.2, 0.8, 4],
-    carStop: [3.95, 0.38, 2.55],
+    rotationY: 0.03,
+    cameraPosition: [13.5, 7.1, 9.8],
+    cameraTarget: [8, 0.8, 1.2],
+    carStop: [4.65, 0.38, 0.7],
   },
   {
     id: 'lab',
@@ -91,12 +91,12 @@ export const locations: CityLocation[] = [
     description: 'A home for AI tools, micro-SaaS ideas and unfinished concepts.',
     action: 'Enter the lab',
     color: '#70bcb5',
-    position: [-6.2, 0.85, 4],
+    position: [-3.8, 0.85, 6.3],
     size: [3.4, 1.7, 2.4],
-    rotationY: 2.144,
-    cameraPosition: [-12.2, 7.6, 12.5],
-    cameraTarget: [-6.2, 0.7, 4],
-    carStop: [-3.95, 0.38, 2.55],
+    rotationY: 0.65,
+    cameraPosition: [-11.2, 7.6, 13],
+    cameraTarget: [-3.8, 0.7, 6.3],
+    carStop: [-2.43, 0.38, 4.02],
   },
   {
     id: 'contact',
@@ -106,16 +106,39 @@ export const locations: CityLocation[] = [
     description: 'The final stop for project ideas, collaborations and hello messages.',
     action: 'Start a conversation',
     color: '#f2866e',
-    position: [-6.3, 1.1, -3.3],
+    position: [6.1, 1.1, 5.3],
     size: [2.8, 2.2, 2.4],
-    rotationY: 1.088,
-    cameraPosition: [-13.2, 7.1, 4.4],
-    cameraTarget: [-6.3, 0.8, -3.3],
-    carStop: [-4.16, 0.38, -2.18],
+    rotationY: 0.14,
+    cameraPosition: [10.8, 7.1, 12.4],
+    cameraTarget: [6.1, 0.8, 5.3],
+    carStop: [3.55, 0.38, 3.08],
   },
 ]
 
 export const visibleLocations = locations.filter(({ id }) => id !== 'plaza')
+
+const projectsLocation = locations.find(({ id }) => id === 'projects')!
+
+export const supplementalBuildings: CityLocation[] = [
+  {
+    ...projectsLocation,
+    title: 'Project District 1',
+    shortTitle: 'Project 1',
+    position: [-6.6, 1.4, -4.1],
+    size: [3, 2.8, 2.4],
+    rotationY: 0.52,
+  },
+  {
+    ...projectsLocation,
+    title: 'Project District 2',
+    shortTitle: 'Project 2',
+    position: [-7.5, 1, 0.4],
+    size: [2.8, 2, 2.4],
+    rotationY: 0.64,
+  },
+]
+
+export const buildingLocations = [...visibleLocations, ...supplementalBuildings]
 
 export function getLocation(id: LocationId) {
   return locations.find((location) => location.id === id) ?? locations[0]

@@ -3,8 +3,7 @@ import type { QualityMode } from '../data/quality'
 
 const treePositions: [number, number, number][] = [
   [-2.5, 0, -2.3], [2.7, 0, -2.4], [-2.7, 0, 2.3], [2.5, 0, 2.5],
-  [-8.3, 0, 0.8], [8.3, 0, 0.7], [-1.6, 0, 7.8], [1.8, 0, -8.3],
-  [-7.8, 0, -6.1], [7.8, 0, 6.3],
+  [-8.7, 0, -2.4], [-8.5, 0, 4.4], [-6.4, 0, 6.2], [8.8, 0, 0],
 ]
 
 const lampPositions: [number, number, number][] = Array.from(
@@ -45,7 +44,7 @@ export function CityDetails({ qualityMode }: { qualityMode: QualityMode }) {
           <Instance
             key={`crown-${position.join('-')}`}
             position={[position[0], 1.55, position[2]]}
-            scale={0.9 + (index % 3) * 0.08}
+            scale={index < 4 ? 0.84 + (index % 3) * 0.06 : 0.72 + (index % 3) * 0.05}
             rotation={[0, index * 0.7, 0]}
           />
         ))}

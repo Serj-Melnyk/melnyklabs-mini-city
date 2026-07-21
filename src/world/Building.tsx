@@ -1,17 +1,23 @@
 import { useGLTF } from '@react-three/drei'
 import { useEffect, useMemo } from 'react'
 import { Color } from 'three'
-import { cityAssetPaths, dracoDecoderPath } from '../data/cityAssets'
+import {
+  cityAssetPaths,
+  dracoDecoderPath,
+  projectAnnexAssetPaths,
+} from '../data/cityAssets'
 import type { CityLocation } from '../data/locations'
 import { InteractiveObject } from './InteractiveObject'
 import { cloneModel, forEachStandardMaterial } from './modelUtils'
 
 type BuildingProps = {
+  assetPath?: string
   location: CityLocation
 }
 
-export function Building({ location }: BuildingProps) {
-  const { scene } = useGLTF(cityAssetPaths[location.id], dracoDecoderPath)
+export function Building({ assetPath, location }: BuildingProps) {
+  const modelPath = assetPath ?? cityAssetPaths[location.id]
+  const { scene } = useGLTF(modelPath, dracoDecoderPath)
   const model = useMemo(() => cloneModel(scene), [scene])
 
   return (
@@ -62,3 +68,4 @@ function ProductionBuildingModel({
 }
 
 Object.values(cityAssetPaths).forEach((path) => useGLTF.preload(path, dracoDecoderPath))
+projectAnnexAssetPaths.forEach((path) => useGLTF.preload(path, dracoDecoderPath))

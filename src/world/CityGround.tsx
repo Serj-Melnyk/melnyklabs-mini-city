@@ -1,13 +1,30 @@
 import { carRouteConfig, sampleCarRoute } from '../data/carRoute'
-import { visibleLocations } from '../data/locations'
+import { buildingLocations } from '../data/locations'
 
 const roadMarkers = Array.from({ length: 24 }, (_, index) =>
   sampleCarRoute(index / 24),
 )
 
+const crosswalkMarkers = [-0.55, 0.64].flatMap((angle, crosswalkIndex) =>
+  Array.from({ length: 6 }, (_, stripeIndex) => {
+    const offset = -0.75 + stripeIndex * 0.3
+    const radius = 5.52
+
+    return {
+      id: `${crosswalkIndex}-${stripeIndex}`,
+      position: [
+        Math.sin(angle) * radius + Math.cos(angle) * offset,
+        0.095,
+        Math.cos(angle) * radius - Math.sin(angle) * offset,
+      ] as [number, number, number],
+      rotationY: angle,
+    }
+  }),
+)
+
 const roadOuterRadius = carRouteConfig.roadOuterRadius
 
-const driveways = visibleLocations.map((location) => {
+const driveways = buildingLocations.map((location, index) => {
   const buildingRadius = Math.hypot(location.position[0], location.position[2])
   const buildingHalfDepth = Math.min(location.size[0], location.size[2]) / 2
   const outerEdge = buildingRadius - buildingHalfDepth - 0.24
@@ -16,7 +33,7 @@ const driveways = visibleLocations.map((location) => {
   const angle = Math.atan2(location.position[0], location.position[2])
 
   return {
-    id: location.id,
+    id: `${location.id}-${index}`,
     length,
     position: [
       Math.sin(angle) * centerRadius,
@@ -30,6 +47,10 @@ const driveways = visibleLocations.map((location) => {
 export function CityGround() {
   return (
     <group>
+      <mesh receiveShadow position={[0, -0.52, 0]}>
+        <cylinderGeometry args={[10.22, 10.35, 0.32, 10]} />
+        <meshStandardMaterial color="#3d4565" roughness={0.97} />
+      </mesh>
       <mesh receiveShadow position={[0, -0.25, 0]}>
         <cylinderGeometry args={[10.1, 10.4, 0.5, 10]} />
         <meshStandardMaterial color="#5e607f" roughness={0.95} />
@@ -50,9 +71,20 @@ export function CityGround() {
         <ringGeometry args={[roadOuterRadius, 5.47, 64]} />
         <meshStandardMaterial color="#d6c9bd" roughness={0.96} />
       </mesh>
-      {visibleLocations.map((location) => (
+      {buildingLocations.map((location, index) => (
         <mesh
-          key={`sidewalk-${location.id}`}
+          key={`green-bed-${location.id}-${index}`}
+          receiveShadow
+          position={[location.position[0], 0.025, location.position[2]]}
+          rotation={[0, location.rotationY, 0]}
+        >
+          <boxGeometry args={[location.size[0] + 0.92, 0.08, location.size[2] + 0.92]} />
+          <meshStandardMaterial color="#77805d" roughness={0.99} />
+        </mesh>
+      ))}
+      {buildingLocations.map((location, index) => (
+        <mesh
+          key={`sidewalk-${location.id}-${index}`}
           receiveShadow
           position={[location.position[0], 0.055, location.position[2]]}
           rotation={[0, location.rotationY, 0]}
@@ -68,8 +100,8 @@ export function CityGround() {
           position={driveway.position}
           rotation={[0, driveway.rotationY, 0]}
         >
-          <boxGeometry args={[0.92, 0.1, driveway.length]} />
-          <meshStandardMaterial color="#aaa4b3" roughness={0.98} />
+          <boxGeometry args={[1.3, 0.1, driveway.length]} />
+          <meshStandardMaterial color="#777994" roughness={0.96} />
         </mesh>
       ))}
       {roadMarkers.map((pose, index) => (
@@ -83,12 +115,12 @@ export function CityGround() {
           <meshStandardMaterial color="#d9d0c5" roughness={0.95} />
         </mesh>
       ))}
-      {Array.from({ length: 6 }, (_, index) => (
+      {crosswalkMarkers.map((marker) => (
         <mesh
-          key={`crosswalk-${index}`}
+          key={`crosswalk-${marker.id}`}
           receiveShadow
-          position={[-0.75 + index * 0.3, 0.075, 5.52]}
-          rotation={[0, -0.08, 0]}
+          position={marker.position}
+          rotation={[0, marker.rotationY, 0]}
         >
           <boxGeometry args={[0.18, 0.025, 0.72]} />
           <meshStandardMaterial color="#e3d9ce" roughness={0.96} />

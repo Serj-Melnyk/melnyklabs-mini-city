@@ -32,6 +32,15 @@ describe('navigation car route', () => {
     }
   })
 
+  it('aligns the model local +X nose with the road tangent', () => {
+    for (const progress of [0, 0.125, 0.25, 0.5, 0.875]) {
+      const pose = sampleCarRoute(progress)
+
+      expect(Math.cos(pose.rotationY)).toBeCloseTo(pose.forward[0])
+      expect(-Math.sin(pose.rotationY)).toBeCloseTo(pose.forward[2])
+    }
+  })
+
   it('always drives forward around the closed route', () => {
     const trip = createCarTrip(0.98, 'services')
     expect(trip.deltaProgress).toBeGreaterThan(0)

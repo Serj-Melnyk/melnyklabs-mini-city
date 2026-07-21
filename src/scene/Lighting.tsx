@@ -5,12 +5,12 @@ export function Lighting({ qualityMode }: { qualityMode: QualityMode }) {
 
   return (
     <>
-      <hemisphereLight args={['#b9d6ff', '#201d3d', 2.1]} />
-      <ambientLight color="#aebedc" intensity={0.32} />
+      <hemisphereLight args={['#c4ddff', '#16142d', 1.45]} />
+      <ambientLight color="#aebedc" intensity={0.22} />
       <directionalLight
         castShadow={fullQuality}
         color="#ffe6bd"
-        intensity={3.2}
+        intensity={3.8}
         position={[8, 12, 7]}
         shadow-mapSize-width={fullQuality ? 1024 : 512}
         shadow-mapSize-height={fullQuality ? 1024 : 512}
