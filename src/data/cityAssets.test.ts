@@ -20,6 +20,9 @@ describe('production city assets', () => {
     expect(productionAssetPaths).toContain(carAssetPath)
     expect(productionAssetPaths).toContain(guideAssetPath)
     expect(carAssetPath).not.toBe(guideAssetPath)
+    expect(carAssetPath).toContain('melnyklabs-sports-car.glb')
+    expect(statSync(resolve(process.cwd(), 'public', carAssetPath.slice(1))).size)
+      .toBeLessThan(100 * 1024)
   })
 
   it('keeps every model present and the combined GLB payload under 4 MB', () => {

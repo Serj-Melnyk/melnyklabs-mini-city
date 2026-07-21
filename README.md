@@ -47,8 +47,11 @@ npm run assets:generate
 ```
 
 The authored models use Draco compression and local decoder files. Repeated
-trees, lamps, and benches are instanced. The car is a CC BY 3.0 model supplied
-by Ignition Labs via Poly Pizza; see [ATTRIBUTIONS.md](ATTRIBUTIONS.md).
+trees, lamps, and benches are instanced. The original low-poly MelnykLabs
+sports car is generated from project-owned primitive geometry alongside the
+city assets, so it has no external model or attribution dependency.
+
+![Original MelnykLabs low-poly sports car](docs/design/melnyklabs-sports-car-preview.png)
 
 ## Contact workflow
 
